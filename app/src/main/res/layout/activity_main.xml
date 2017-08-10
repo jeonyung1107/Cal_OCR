@@ -9,17 +9,25 @@
     android:weightSum="1">
     
     <FrameLayout
+        android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <SurfaceView
             android:id="@+id/surfaceView1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="invisible"/>
 
         <SurfaceView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/imageview1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"/>
+
 
     </FrameLayout>
 
@@ -27,6 +35,7 @@
         android:id="@+id/button1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="촬영" />
+        android:text="촬영"
+        android:layout_weight="1"/>
 
 </LinearLayout>

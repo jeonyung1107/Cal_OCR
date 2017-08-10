@@ -14,11 +14,20 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.Button;
+import android.graphics.Bitmap;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.jar.Manifest;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
+
 //todo 뷰 사이즈 조절
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback {
 
@@ -29,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
     private Button button;
-
+    private Detector detector;
+    private ImageView mImageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /*허가 받는 부분*/
@@ -47,16 +57,26 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
 
+        mImageView = (ImageView) findViewById(R.id.imageview1);
+
         //todo 촬영 기능 만들 것
         /*버튼 클릭 시 촬영 -> 편집 화면 Intent 콜*/
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCamera.takePicture(null,null,null);
+//                mCamera.takePicture(null,null,null);
+                mImageView.setImageBitmap(detector.cvTest());
             }
         });
+
+        detector = new Detector(this);
     }
 
+    @Override
+    protected void onResume() {
+        detector.onResume(this);
+        super.onResume();
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
