@@ -29,7 +29,7 @@ import java.io.IOException;
 public class Detector {
     private final static String TAG = "Detector";
     Context context;
-    Mat d,gray;
+    Mat d,gray,thres, edged;
     MatOfPoint MP;
     public Detector(Context context){
         this.context = context;
@@ -37,22 +37,24 @@ public class Detector {
     /*영역 인식 메서드, */
     public Bitmap cvTest(){
         try {
-            d = Utils.loadResource(context, R.drawable.b, Imgcodecs.CV_LOAD_IMAGE_COLOR);
+            d = Utils.loadResource(context, R.drawable.a, Imgcodecs.CV_LOAD_IMAGE_COLOR);
         }catch (IOException i){
             Log.e(TAG,i.toString());
         }
         gray = new Mat(d.rows(),d.cols(),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
-        Imgproc.cvtColor(d,gray, Imgproc.COLOR_RGB2GRAY,1);
-        Mat cvCorner = d.clone();
-        MP = new MatOfPoint();
-        Imgproc.goodFeaturesToTrack(gray,MP,100,0.001,100);
-        List<Point> points = MP.toList();
-        for(int i=0; i<points.size(); i++){
-            Imgproc.circle(cvCorner,points.get(i),50,  new Scalar(0,255,0));
-            Log.i(TAG,i+"");
-        }
-        Bitmap b = Bitmap.createBitmap(cvCorner.width(),cvCorner.height(), Bitmap.Config.RGB_565);
-        Utils.matToBitmap(cvCorner,b);
+        thres = new Mat(gray.rows(),gray.cols(),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+        edged = new Mat(thres.rows(), thres.cols(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+
+        Imgproc.cvtColor(d,gray, Imgproc.COLOR_RGB2GRAY,1);//grayscaling
+        Imgproc.adaptiveThreshold(gray,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+                Imgproc.THRESH_BINARY,5,10); //binary
+        Imgproc.Canny(thres,edged,75,200,3,false);
+
+        Mat cvResult = thres.clone();
+
+        /*결과물 반환*/
+        Bitmap b = Bitmap.createBitmap(cvResult.width(),cvResult.height(), Bitmap.Config.RGB_565);
+        Utils.matToBitmap(cvResult,b);
         return b;
     }
 
@@ -75,7 +77,7 @@ public class Detector {
 
     public void onResume(Context context)
     {
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, context, mLoaderCallback);
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, context, mLoaderCallback);
     }
 
 

@@ -2,8 +2,6 @@ package com.coffdope.jeon.cal_ocr;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.media.MediaRecorder;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,24 +10,28 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.Button;
-import android.graphics.Bitmap;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.jar.Manifest;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.opencv.android.Utils;
+import org.opencv.imgcodecs.Imgcodecs;
 
 //todo 뷰 사이즈 조절
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback {
+    static {
+        if(!OpenCVLoader.initDebug()) {
+            Log.d("My App", "Unable to load OpenCV");
+        } else {
+            Log.d("My App", "OpenCV loaded");
+        }
+    }
 
     private final static int PERMISSIONS_REQUEST_CODE = 100;
     private final static String TAG = "Main";
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private Button button;
     private Detector detector;
     private ImageView mImageView;
+
+    Mat d;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /*허가 받는 부분*/
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             public void onClick(View view) {
 //                mCamera.takePicture(null,null,null);
                 mImageView.setImageBitmap(detector.cvTest());
+//                cvTest(d);
             }
         });
 
@@ -76,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     protected void onResume() {
         detector.onResume(this);
         super.onResume();
+
     }
 
     @Override
@@ -119,5 +125,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
 
+    }
+
+    private void cvTest(Mat src){
+        try {
+            src = Utils.loadResource(this, R.drawable.a, Imgcodecs.CV_LOAD_IMAGE_COLOR);
+        }catch(IOException e){
+
+        }
     }
 }
