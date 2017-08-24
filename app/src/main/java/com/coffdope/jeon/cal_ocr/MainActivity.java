@@ -1,7 +1,10 @@
 package com.coffdope.jeon.cal_ocr;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -40,10 +43,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
     private Button button;
-    private Detector detector;
+    private DetectorTask detector;
     private ImageView mImageView;
 
-    Mat d;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /*허가 받는 부분*/
@@ -68,18 +70,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                mCamera.takePicture(null,null,null);
-                mImageView.setImageBitmap(detector.cvTest());
-//                cvTest(d);
+//                mImageView.setImageBitmap(b);
             }
         });
-
-        detector = new Detector(this);
     }
 
     @Override
     protected void onResume() {
-        detector.onResume(this);
         super.onResume();
 
     }
@@ -93,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         for (Camera.Size size : listPreviewSize) {
             Log.i(TAG, String.format("Supported Preview Size (%d, %d)", size.width, size.height));
         }
-        Camera.Size previewSize = listPreviewSize.get(1);
+        Camera.Size previewSize = listPreviewSize.get(0);
         params.setPreviewSize(previewSize.width, previewSize.height);
 
         mCamera.setDisplayOrientation(90);
@@ -108,8 +105,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        Camera.Parameters p = mCamera.getParameters();
-//        p.setPreviewSize(i1,i2);
+        mCamera.setPreviewCallback(this);
         mCamera.startPreview();
     }
 
@@ -122,16 +118,40 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
     //todo 프리뷰에서 영역 인식 구현, surfaceview 두개 이용해서 만들 것
     //todo 영역 인식 후 영역 밚환 -> 반환 된 영역 그리기
+    //todo 영역 인식이 한차례 끝나야 다시 함수 호출하도록 구현할 것
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
-
-    }
-
-    private void cvTest(Mat src){
-        try {
-            src = Utils.loadResource(this, R.drawable.a, Imgcodecs.CV_LOAD_IMAGE_COLOR);
-        }catch(IOException e){
-
+        if(detector == null||detector.getStatus() == AsyncTask.Status.FINISHED){
+            detector = new DetectorTask(this);
+            detector.execute(bytes);
+        }else{
+            Log.i(TAG,"no Back");
         }
     }
+
+    /*detector 백그라운드 실행시키는 Async class*/
+    private class DetectorTask extends AsyncTask<byte[],Void,Bitmap>{
+        Context context;
+        public DetectorTask(Context context){
+            this.context = context;
+        }
+        @Override
+        protected Bitmap doInBackground(byte[]...bytes){
+            Bitmap result = new Detector(context, mCamera.getParameters().getPreviewSize()).detectPage(bytes[0]);
+            return result;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            mImageView.setImageBitmap(bitmap);
+            mImageView.setVisibility(View.VISIBLE);
+            super.onPostExecute(bitmap);
+        }
+    }
+
 }
