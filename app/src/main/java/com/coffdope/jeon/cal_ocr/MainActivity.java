@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Button;
 
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private Button button;
     private DetectorTask detector;
     private ImageView mImageView;
+    private ImageView mImageView2;
+    private LinearLayout mLinear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder.addCallback(this);
 
         mImageView = (ImageView) findViewById(R.id.imageview1);
+        mImageView2 = (ImageView) findViewById(R.id.imageview2);
+
+        mLinear = (LinearLayout)findViewById(R.id.linear1);
 
         //todo 촬영 기능 만들 것
         /*버튼 클릭 시 촬영 -> 편집 화면 Intent 콜*/
@@ -130,14 +136,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     /*detector 백그라운드 실행시키는 Async class*/
-    private class DetectorTask extends AsyncTask<byte[],Void,Bitmap>{
+    private class DetectorTask extends AsyncTask<byte[],Void,Bitmap[]>{
         Context context;
         public DetectorTask(Context context){
             this.context = context;
         }
         @Override
-        protected Bitmap doInBackground(byte[]...bytes){
-            Bitmap result = new Detector(context, mCamera.getParameters().getPreviewSize()).detectPage(bytes[0]);
+        protected Bitmap[] doInBackground(byte[]...bytes){
+            Bitmap[] result = new Detector(context, mCamera.getParameters().getPreviewSize()).detectPage(bytes[0]);
             return result;
         }
 
@@ -147,9 +153,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            mImageView.setImageBitmap(bitmap);
-            mImageView.setVisibility(View.VISIBLE);
+        protected void onPostExecute(Bitmap[] bitmap) {
+            mImageView.setImageBitmap(bitmap[0]);
+            mImageView2.setImageBitmap(bitmap[1]);
+            mLinear.setVisibility(View.VISIBLE);
             super.onPostExecute(bitmap);
         }
     }

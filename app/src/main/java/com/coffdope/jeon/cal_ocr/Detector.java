@@ -30,7 +30,7 @@ public class Detector {
     private static int idx =0;
     Context context;
     Camera.Size size;
-    Mat input_image,output_image;
+    Mat input_image,output_image,inter_image;
 
     ArrayList<MatOfPoint> cnt = new ArrayList<MatOfPoint>();
     public Detector() {
@@ -42,17 +42,22 @@ public class Detector {
         this.size = size;
     }
     /*영역 인식 메서드, */
-    public Bitmap detectPage(byte[] bytes){
+    public Bitmap[] detectPage(byte[] bytes){
+        Bitmap[] result_bitmap = new Bitmap[2];
+        ArrayList<MatOfPoint> result_test = new ArrayList<MatOfPoint>();
+
         input_image = new Mat(size.height,size.width,Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         output_image = new Mat(size.height,size.width,Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+        inter_image = new Mat(size.height,size.width,Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         input_image.put(0,0,bytes);
 //        try {
 //            input_image = Utils.loadResource(context, R.drawable.a, Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
 //        }catch (IOException e){
 //
 //        }
-        Imgproc.GaussianBlur(output_image,output_image,new Size(5,5),5,5);
-        Imgproc.Canny(output_image,output_image,75,200,3,false);
+        Imgproc.GaussianBlur(output_image,inter_image,new Size(5,5),5,5);
+        //todo adpativethreshold 테스트 해보기
+        Imgproc.Canny(inter_image,output_image,75,200,3,false);
         Log.i(TAG,"canny");
 
         /*contour*/
@@ -70,28 +75,44 @@ public class Detector {
             }
         });
 
+        /*top 5 저장*/
+        if(cnt.size()>5){
+            int cnt_size = cnt.size();
+            for(int i = cnt_size; i>5; i--){
+                cnt.remove(i-1);
+            }
+        }
 
         /*가장 큰 영역부터 4개의 꼭지점을 가지는 contour찾는다.*/
         double arclength;
         MatOfPoint2f mat2 = new MatOfPoint2f(); //contour 결과물 저장하는 motofpoint2f
         MatOfPoint2f approx = new MatOfPoint2f();
+
+        /*cnt에 저장되어있는 contour들 조건 탐색*/
         for(MatOfPoint c :cnt){
-            mat2.fromArray(c.toArray());
+            mat2.fromArray(c.toArray()); //matofpoint2f 형태로 변환
             arclength = Imgproc.arcLength(mat2,true);
-            Imgproc.approxPolyDP(mat2,approx,0.02*arclength,true);
-            if(approx.toArray().length==4){
+            Imgproc.approxPolyDP(mat2,approx,0.02*arclength,true); //단순화
+            if(approx.toArray().length==4&&Imgproc.contourArea(c)>10000&&
+                    Imgproc.isContourConvex(c)){
+                result_test.add(new MatOfPoint(approx.toArray())); //선택된 contour만 추가한다.
                 break;
             }
         }
 
         /*결과물 반환*/
-        ArrayList<MatOfPoint> result_test = new ArrayList<MatOfPoint>();
-        result_test.add(new MatOfPoint(approx.toArray()));
-        Imgproc.drawContours(input_image,result_test,-1,new Scalar(255,0,0),2);
+        //todo 조건 충족하는 contour없는 경우 설정해서 결과 출력하도록 할것
+        //todo 마지막에 어떻게 transform 할것인지 고민할 필요 있음
+        if(!result_test.isEmpty()) {Imgproc.drawContours(input_image,result_test,-1,new Scalar(255,0,0),2);}
         Mat cvResult = input_image.clone();
+        Mat cvResult2 = output_image.clone();
         Bitmap b = Bitmap.createBitmap(cvResult.width(),cvResult.height(), Bitmap.Config.RGB_565);
+        Bitmap test_bitmap = Bitmap.createBitmap(cvResult2.width(),cvResult2.height(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(cvResult,b);
-        return b;
+        Utils.matToBitmap(cvResult2,test_bitmap);
+        result_bitmap[0] = b;
+        result_bitmap[1] = test_bitmap;
+        return result_bitmap;
     }
 
 
