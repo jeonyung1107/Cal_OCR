@@ -154,7 +154,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         @Override
         protected void onPostExecute(Bitmap[] bitmap) {
-            mImageView.setImageBitmap(bitmap[0]);
+            mImageView.setImageBitmap(bitmap[1]);
+//            mImageView.setVisibility(View.INVISIBLE);
             mImageView2.setImageBitmap(bitmap[1]);
             mLinear.setVisibility(View.VISIBLE);
             super.onPostExecute(bitmap);
