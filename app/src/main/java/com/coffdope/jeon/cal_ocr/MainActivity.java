@@ -88,6 +88,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     @Override
+    protected void onPause() {
+        mCamera.release();
+        super.onPause();
+    }
+
+    @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         mCamera = Camera.open();
 
@@ -96,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         for (Camera.Size size : listPreviewSize) {
             Log.i(TAG, String.format("Supported Preview Size (%d, %d)", size.width, size.height));
         }
-        Camera.Size previewSize = listPreviewSize.get(0);
+        Camera.Size previewSize = listPreviewSize.get(listPreviewSize.size()-3);
         params.setPreviewSize(previewSize.width, previewSize.height);
 
         mCamera.setDisplayOrientation(90);
@@ -154,8 +160,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         @Override
         protected void onPostExecute(Bitmap[] bitmap) {
-            mImageView.setImageBitmap(bitmap[1]);
-//            mImageView.setVisibility(View.INVISIBLE);
+            mImageView.setImageBitmap(bitmap[0]);
             mImageView2.setImageBitmap(bitmap[1]);
             mLinear.setVisibility(View.VISIBLE);
             super.onPostExecute(bitmap);
