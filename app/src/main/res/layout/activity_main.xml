@@ -19,29 +19,15 @@
             android:layout_height="wrap_content"
             android:visibility="visible"/>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:id="@+id/linear1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible">
-
-            <ImageView
-                android:id="@+id/imageview1"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:rotation="90"
-                android:layout_weight="1"/>
-            <ImageView
-                android:id="@+id/imageview2"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:rotation="90"
-                android:layout_weight="1"/>
-        </LinearLayout>
 
 
-
+        <ImageView
+            android:id="@+id/imageview1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:rotation="90"
+            android:visibility="invisible"
+            />
     </FrameLayout>
 
     <Button

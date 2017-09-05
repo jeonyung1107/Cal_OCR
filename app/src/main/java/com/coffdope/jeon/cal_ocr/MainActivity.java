@@ -2,7 +2,6 @@ package com.coffdope.jeon.cal_ocr;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -24,10 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Mat;
-import org.opencv.android.Utils;
 import org.opencv.core.MatOfPoint;
-import org.opencv.imgcodecs.Imgcodecs;
 
 //todo 뷰 사이즈 조절
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback {
@@ -46,10 +42,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
     private Button button;
-    private DetectorTask detector;
+    private DetectorTask mDetectorTask;
     private ImageView mImageView;
-    private ImageView mImageView2;
-    private LinearLayout mLinear;
+
+    private ArrayList<MatOfPoint> mContour = new ArrayList<MatOfPoint>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +65,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder.addCallback(this);
 
         mImageView = (ImageView) findViewById(R.id.imageview1);
-        mImageView2 = (ImageView) findViewById(R.id.imageview2);
-
-        mLinear = (LinearLayout)findViewById(R.id.linear1);
 
         //todo 촬영 기능 만들 것
         /*버튼 클릭 시 촬영 -> 편집 화면 Intent 콜*/
@@ -112,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         for (Camera.Size size : listPreviewSize) {
             Log.i(TAG, String.format("Supported Preview Size (%d, %d)", size.width, size.height));
         }
-        Camera.Size previewSize = listPreviewSize.get(listPreviewSize.size()-3);
+        Camera.Size previewSize = listPreviewSize.get(0);
         params.setPreviewSize(previewSize.width, previewSize.height);
 
         mCamera.setDisplayOrientation(90);
@@ -143,24 +136,27 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     //todo 영역 인식이 한차례 끝나야 다시 함수 호출하도록 구현할 것
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
-        if(detector == null||detector.getStatus() == AsyncTask.Status.FINISHED){
-            detector = new DetectorTask(this);
-            detector.execute(bytes);
+        if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
+            mDetectorTask = new DetectorTask(this);
+            mDetectorTask.execute(bytes);
         }else{
             Log.i(TAG,"no Back");
         }
     }
 
-    /*detector 백그라운드 실행시키는 Async class*/
+    /*mDetectorTask 백그라운드 실행시키는 Async class*/
     private class DetectorTask extends AsyncTask<byte[],Void,ArrayList<MatOfPoint>>{
         Context context;
+        Detector mDetector;
         public DetectorTask(Context context){
             this.context = context;
         }
         @Override
         protected ArrayList<MatOfPoint> doInBackground(byte[]...bytes){
-            ArrayList<MatOfPoint> result = new Detector(context, mCamera.getParameters().getPreviewSize()).detectPage(bytes[0]);
-            return result;
+            mDetector = new Detector(context, mCamera.getParameters().getPreviewSize());
+            ArrayList<MatOfPoint> tmp = mDetector.detectPage(bytes[0]);
+            if(!tmp.isEmpty()){mContour = tmp;}
+            return mContour;
         }
 
         @Override
@@ -170,9 +166,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         @Override
         protected void onPostExecute(ArrayList<MatOfPoint> contour) {
-//            mImageView.setImageBitmap();
-
-            mLinear.setVisibility(View.VISIBLE);
             super.onPostExecute(contour);
         }
     }
