@@ -41,8 +41,9 @@ public class Detector {
         this.context = context;
         this.size = size;
     }
+
     /*영역 인식 메서드, */
-    public Bitmap[] detectPage(byte[] bytes){
+    public ArrayList<MatOfPoint> detectPage(byte[] bytes){
         Bitmap[] result_bitmap = new Bitmap[2];
         ArrayList<MatOfPoint> result_test = new ArrayList<MatOfPoint>();
 
@@ -89,7 +90,7 @@ public class Detector {
             mat2.fromArray(c.toArray()); //matofpoint2f 형태로 변환
             arclength = Imgproc.arcLength(mat2,true);
             Imgproc.approxPolyDP(mat2,approx,0.1*arclength,true); //단순화
-            if(approx.toArray().length==4&&Imgproc.contourArea(c)>10000){
+            if(approx.toArray().length==4&&Imgproc.contourArea(c)>1000){
                 result_test.add(new MatOfPoint(approx.toArray())); //선택된 contour만 추가한다.
                 break;
             }
@@ -105,9 +106,7 @@ public class Detector {
         Bitmap test_bitmap = Bitmap.createBitmap(cvResult2.width(),cvResult2.height(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(cvResult,b);
         Utils.matToBitmap(cvResult2,test_bitmap);
-        result_bitmap[0] = b;
-        result_bitmap[1] = test_bitmap;
-        return result_bitmap;
+        return result_test; //contour 반환
     }
 
 

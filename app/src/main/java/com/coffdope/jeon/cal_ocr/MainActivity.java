@@ -20,11 +20,13 @@ import android.widget.Toast;
 import android.widget.Button;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 import org.opencv.android.Utils;
+import org.opencv.core.MatOfPoint;
 import org.opencv.imgcodecs.Imgcodecs;
 
 //todo 뷰 사이즈 조절
@@ -88,7 +90,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     @Override
+    protected void onDestroy() {
+        if(mCamera!=null)
+        mCamera.release();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onPause() {
+        if(mCamera!=null)
         mCamera.release();
         super.onPause();
     }
@@ -142,14 +152,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     /*detector 백그라운드 실행시키는 Async class*/
-    private class DetectorTask extends AsyncTask<byte[],Void,Bitmap[]>{
+    private class DetectorTask extends AsyncTask<byte[],Void,ArrayList<MatOfPoint>>{
         Context context;
         public DetectorTask(Context context){
             this.context = context;
         }
         @Override
-        protected Bitmap[] doInBackground(byte[]...bytes){
-            Bitmap[] result = new Detector(context, mCamera.getParameters().getPreviewSize()).detectPage(bytes[0]);
+        protected ArrayList<MatOfPoint> doInBackground(byte[]...bytes){
+            ArrayList<MatOfPoint> result = new Detector(context, mCamera.getParameters().getPreviewSize()).detectPage(bytes[0]);
             return result;
         }
 
@@ -159,11 +169,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
 
         @Override
-        protected void onPostExecute(Bitmap[] bitmap) {
-            mImageView.setImageBitmap(bitmap[0]);
-            mImageView2.setImageBitmap(bitmap[1]);
+        protected void onPostExecute(ArrayList<MatOfPoint> contour) {
+//            mImageView.setImageBitmap();
+
             mLinear.setVisibility(View.VISIBLE);
-            super.onPostExecute(bitmap);
+            super.onPostExecute(contour);
         }
     }
 
