@@ -25,7 +25,6 @@ import java.util.List;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.MatOfPoint;
 
-//todo 뷰 사이즈 조절
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback {
     static {
         if(!OpenCVLoader.initDebug()) {
@@ -133,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
     //todo 프리뷰에서 영역 인식 구현, surfaceview 두개 이용해서 만들 것
     //todo 영역 인식 후 영역 밚환 -> 반환 된 영역 그리기
-    //todo 영역 인식이 한차례 끝나야 다시 함수 호출하도록 구현할 것
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
@@ -167,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         @Override
         protected void onPostExecute(ArrayList<MatOfPoint> contour) {
             super.onPostExecute(contour);
+            //todo contour 프리뷰 위에 덧씌우기
         }
     }
 

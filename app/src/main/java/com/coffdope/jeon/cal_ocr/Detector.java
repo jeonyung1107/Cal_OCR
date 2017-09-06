@@ -1,6 +1,7 @@
 package com.coffdope.jeon.cal_ocr;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
@@ -19,6 +20,7 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Arrays;
 
 import java.io.IOException;
 
@@ -77,10 +79,10 @@ public class Detector {
             }
         });
         /*top 5 저장*/
-        if(cnt.size()>1){
+        if(cnt.size()>5){
             int cnt_size = cnt.size();
-            for(int i = cnt_size; i>1; i--){
-                cnt.remove(i-1);
+            for(int i = cnt_size; i>5; i--){
+                cnt.remove(i-5);
             }
         }
 
@@ -102,17 +104,84 @@ public class Detector {
         }
 
         /*결과물 반환*/
-        //todo 조건 충족하는 contour없는 경우 설정해서 결과 출력하도록 할것
-        //todo 마지막에 어떻게 transform 할것인지 고민할 필요 있음
+        Core.multiply(result_cnt.get(0),new Scalar(ratio,ratio),result_cnt.get(0)); //원래 크기로 복구
         return result_cnt; //contour 반환
     }
-    //todo transform 구현
-    public Bitmap four_point_transform(ArrayList<MatOfPoint> contour, ){
 
+    public Mat four_point_transform(MatOfPoint contour, Mat src){
+        Point[] ordered = sortPoints(contour.toArray());
+
+        Point tl = ordered[0];
+        Point tr = ordered[1];
+        Point br = ordered[2];
+        Point bl = ordered[3];
+
+        double widthA = Math.sqrt(Math.pow(br.x - bl.x, 2) + Math.pow(br.y - bl.y, 2));
+        double widthB = Math.sqrt(Math.pow(tr.x - tl.x, 2) + Math.pow(tr.y - tl.y, 2));
+
+        double dw = Math.max(widthA, widthB);
+        int maxWidth = Double.valueOf(dw).intValue();
+
+        double heightA = Math.sqrt(Math.pow(tr.x - br.x, 2) + Math.pow(tr.y - br.y, 2));
+        double heightB = Math.sqrt(Math.pow(tl.x - bl.x, 2) + Math.pow(tl.y - bl.y, 2));
+
+        double dh = Math.max(heightA, heightB);
+        int maxHeight = Double.valueOf(dh).intValue();
+
+        Mat result = new Mat(maxHeight, maxWidth, CvType.CV_8UC4);
+
+        Mat src_mat = new Mat(4, 1, CvType.CV_32FC2);
+        Mat dst_mat = new Mat(4, 1, CvType.CV_32FC2);
+
+        src_mat.put(0, 0, tl.x, tl.y, tr.x, tr.y, br.x, br.y, bl.x, bl.y);
+        dst_mat.put(0, 0, 0.0, 0.0, dw, 0.0, dw, dh, 0.0, dh);
+
+        Mat m = Imgproc.getPerspectiveTransform(src_mat, dst_mat);
+        Imgproc.warpPerspective(src, result, m, result.size());
+
+        return  result;
     }
 
+    private Point[] sortPoints( Point[] src ) {
+
+        ArrayList<Point> srcPoints = new ArrayList<>(Arrays.asList(src));
+
+        Point[] result = { null , null , null , null };
+
+        Comparator<Point> sumComparator = new Comparator<Point>() {
+            @Override
+            public int compare(Point lhs, Point rhs) {
+                return Double.valueOf(lhs.y + lhs.x).compareTo(rhs.y + rhs.x);
+            }
+        };
+
+        Comparator<Point> diffComparator = new Comparator<Point>() {
+
+            @Override
+            public int compare(Point lhs, Point rhs) {
+                return Double.valueOf(lhs.y - lhs.x).compareTo(rhs.y - rhs.x);
+            }
+        };
+
+        // top-left corner = minimal sum
+        result[0] = Collections.min(srcPoints, sumComparator);
+
+        // bottom-right corner = maximal sum
+        result[2] = Collections.max(srcPoints, sumComparator);
+
+        // top-right corner = minimal diference
+        result[1] = Collections.min(srcPoints, diffComparator);
+
+        // bottom-left corner = maximal diference
+        result[3] = Collections.max(srcPoints, diffComparator);
+
+        return result;
+    }
+
+    public Mat findRects(Mat src){
+        
+    }
     public Bitmap cnt_image(byte[] bytes,ArrayList<MatOfPoint> contour){
-        if(!contour.isEmpty()){Core.multiply(contour.get(0),new Scalar(ratio,ratio),contour.get(0));}
         if(!contour.isEmpty()) {Imgproc.drawContours(input_image,contour,-1,new Scalar(255,0,0),2);} //조건 만족하는 contour이는 경우 그린다.
         Bitmap b = Bitmap.createBitmap(input_image.width(),input_image.height(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(input_image,b);
