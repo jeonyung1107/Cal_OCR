@@ -2,6 +2,8 @@ package com.coffdope.jeon.cal_ocr;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +22,7 @@ import android.widget.Button;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.opencv.android.OpenCVLoader;
@@ -40,11 +43,16 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private Button button;
+    private Button button,button2;
     private DetectorTask mDetectorTask;
     private ImageView mImageView;
+    private Camera.Size mCameraSize;
+    private OCR mOCR;
 
     private ArrayList<MatOfPoint> mContour = new ArrayList<MatOfPoint>();
+    private ArrayList<MatOfPoint> mContour2 = new ArrayList<MatOfPoint>();
+
+    Calendar_activity cal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         setContentView(R.layout.activity_main);
 
         button = (Button)findViewById(R.id.button1);
+        button2 = (Button) findViewById(R.id.button2);
 
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
         mSurfaceHolder = mSurfaceView.getHolder();
@@ -65,12 +74,21 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         mImageView = (ImageView) findViewById(R.id.imageview1);
 
-        //todo 촬영 기능 만들 것
+        mOCR = new OCR(this);
+
+        //todo 촬영 기능 만들 것 촬영 시 시점 전환도 같이 하도록 하고 프리뷰 호출
         /*버튼 클릭 시 촬영 -> 편집 화면 Intent 콜*/
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                mImageView.setImageBitmap(b);
+            }
+        });
+        button2.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                cal = new Calendar_activity();
+                // TODO: 17. 9. 10 이번트 등록 완전히 구현
+                startActivity(cal.insert_event(2014,05,05,12,00,"test"));
             }
         });
     }
@@ -119,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+        mCameraSize = mCamera.getParameters().getPreviewSize();
         mCamera.setPreviewCallback(this);
         mCamera.startPreview();
     }
@@ -131,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         Toast.makeText(this, "카메라 해제", Toast.LENGTH_SHORT).show();
     }
     //todo 프리뷰에서 영역 인식 구현, surfaceview 두개 이용해서 만들 것
-    //todo 영역 인식 후 영역 밚환 -> 반환 된 영역 그리기
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
@@ -146,14 +164,21 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private class DetectorTask extends AsyncTask<byte[],Void,ArrayList<MatOfPoint>>{
         Context context;
         Detector mDetector;
+        byte[] b;
         public DetectorTask(Context context){
             this.context = context;
         }
         @Override
         protected ArrayList<MatOfPoint> doInBackground(byte[]...bytes){
-            mDetector = new Detector(context, mCamera.getParameters().getPreviewSize());
+            mDetector = new Detector(context, mCameraSize);
             ArrayList<MatOfPoint> tmp = mDetector.detectPage(bytes[0]);
-            if(!tmp.isEmpty()){mContour = tmp;}
+            if(!tmp.isEmpty()){
+                mContour = tmp;
+                mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
+            }else{
+                mContour = (ArrayList<MatOfPoint>) mContour2.clone();
+            }
+            b = bytes[0];
             return mContour;
         }
 
@@ -164,9 +189,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         @Override
         protected void onPostExecute(ArrayList<MatOfPoint> contour) {
+            mImageView.setImageBitmap( mDetector.cnt_image(b, contour));
+            mImageView.setVisibility(View.VISIBLE);
             super.onPostExecute(contour);
-            //todo contour 프리뷰 위에 덧씌우기
         }
     }
+
 
 }

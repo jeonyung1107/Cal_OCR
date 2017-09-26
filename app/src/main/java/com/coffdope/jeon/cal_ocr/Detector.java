@@ -61,6 +61,14 @@ public class Detector {
         input_image.put(0,0,bytes);
         Imgproc.resize(input_image,inter_image,new Size(inter_image.width(),inter_image.height()));
 
+//        try{
+//            input_image = Utils.loadResource(context, R.drawable.a, Imgcodecs.CV_LOAD_IMAGE_COLOR);
+//        }catch (IOException e){
+//
+//        }
+//        Imgproc.resize(input_image,inter_image,new Size(inter_image.width(),inter_image.height()));
+//        Imgproc.cvtColor(inter_image, inter_image, Imgproc.COLOR_BGR2GRAY);
+
         /*이미지 전처리*/
         Imgproc.GaussianBlur(inter_image,inter_image,new Size(5,5),8,8);
         Imgproc.Canny(inter_image,output_image,75,200,3,false);
@@ -101,10 +109,11 @@ public class Detector {
                 Log.i(TAG,"success!!");
                 break;
             }
+
         }
 
         /*결과물 반환*/
-        Core.multiply(result_cnt.get(0),new Scalar(ratio,ratio),result_cnt.get(0)); //원래 크기로 복구
+        if(!result_cnt.isEmpty())Core.multiply(result_cnt.get(0),new Scalar(ratio,ratio),result_cnt.get(0)); //원래 크기로 복구
         return result_cnt; //contour 반환
     }
 
@@ -174,15 +183,16 @@ public class Detector {
 
         // bottom-left corner = maximal diference
         result[3] = Collections.max(srcPoints, diffComparator);
-
         return result;
     }
 
+    // TODO: 17. 9. 26 findRect needs to be implemented
     public Mat findRects(Mat src){
-        
+
+        return new Mat();
     }
     public Bitmap cnt_image(byte[] bytes,ArrayList<MatOfPoint> contour){
-        if(!contour.isEmpty()) {Imgproc.drawContours(input_image,contour,-1,new Scalar(255,0,0),2);} //조건 만족하는 contour이는 경우 그린다.
+        Imgproc.drawContours(input_image,contour,-1,new Scalar(255,0,0),2); //조건 만족하는 contour이는 경우 그린다.
         Bitmap b = Bitmap.createBitmap(input_image.width(),input_image.height(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(input_image,b);
 
