@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder.addCallback(this);
 
         mImageView = (ImageView) findViewById(R.id.imageview1);
+        mImageView.setAlpha(0.8f);
 
         mOCR = new OCR(this);
 
@@ -189,11 +190,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         @Override
         protected void onPostExecute(ArrayList<MatOfPoint> contour) {
-            mImageView.setImageBitmap( mDetector.cnt_image(b, contour));
+//            mImageView.setImageBitmap( mDetector.cnt_image(b, contour));
             mImageView.setVisibility(View.VISIBLE);
             super.onPostExecute(contour);
         }
     }
-
-
 }
