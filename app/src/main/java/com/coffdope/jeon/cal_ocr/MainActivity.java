@@ -1,9 +1,12 @@
 package com.coffdope.jeon.cal_ocr;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -26,7 +29,12 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback {
     static {
@@ -41,13 +49,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private final static String TAG = "Main";
 
     private SurfaceView mSurfaceView;
-    private SurfaceHolder mSurfaceHolder;
+    private SurfaceHolder mSurfaceHolder, mOCR_holder;
     private Camera mCamera;
     private Button button,button2;
     private DetectorTask mDetectorTask;
-    private ImageView mImageView;
+    private OCR_Preview mOCR_preview;
     private Camera.Size mCameraSize;
     private OCR mOCR;
+    private int mOCR_height;
+    private int mOCR_width;
 
     private ArrayList<MatOfPoint> mContour = new ArrayList<MatOfPoint>();
     private ArrayList<MatOfPoint> mContour2 = new ArrayList<MatOfPoint>();
@@ -57,8 +67,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /*허가 받는 부분*/
-        if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CODE);
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CODE);
         }
 
         super.onCreate(savedInstanceState);
@@ -72,10 +82,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
 
-        mImageView = (ImageView) findViewById(R.id.imageview1);
-        mImageView.setAlpha(0.8f);
+        mOCR_preview = (OCR_Preview) findViewById(R.id.OCR_preview);
+        mOCR_preview.setZOrderOnTop(true);
+        mOCR_holder = mOCR_preview.getHolder();
+        mOCR_holder.setFormat(PixelFormat.TRANSPARENT);
 
-        mOCR = new OCR(this);
+//        mOCR = new OCR(this);
 
         //todo 촬영 기능 만들 것 촬영 시 시점 전환도 같이 하도록 하고 프리뷰 호출
         /*버튼 클릭 시 촬영 -> 편집 화면 Intent 콜*/
@@ -156,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
+            mOCR_height = mOCR_preview.getHeight();
+            mOCR_width = mOCR_preview.getWidth();
         }else{
             Log.i(TAG,"no Back");
         }
@@ -165,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private class DetectorTask extends AsyncTask<byte[],Void,ArrayList<MatOfPoint>>{
         Context context;
         Detector mDetector;
-        byte[] b;
         public DetectorTask(Context context){
             this.context = context;
         }
@@ -179,7 +192,19 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             }else{
                 mContour = (ArrayList<MatOfPoint>) mContour2.clone();
             }
-            b = bytes[0];
+
+            Canvas mCanvas = mOCR_holder.lockCanvas();
+            Mat mat = new Mat(mOCR_height, mOCR_width, Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+            Bitmap cntBitmap = Bitmap.createBitmap(mOCR_width, mOCR_height, Bitmap.Config.ARGB_8888);
+            try{
+                synchronized (mOCR_holder){
+                    Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
+                    Utils.matToBitmap(mat,cntBitmap);
+                    mCanvas.drawBitmap(cntBitmap,0,0,null);
+                }
+            }finally {
+                mOCR_holder.unlockCanvasAndPost(mCanvas);
+            }
             return mContour;
         }
 
@@ -190,8 +215,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         @Override
         protected void onPostExecute(ArrayList<MatOfPoint> contour) {
-//            mImageView.setImageBitmap( mDetector.cnt_image(b, contour));
-            mImageView.setVisibility(View.VISIBLE);
             super.onPostExecute(contour);
         }
     }

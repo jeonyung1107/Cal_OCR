@@ -20,12 +20,12 @@
             android:layout_height="wrap_content"
             android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/imageview1"
+        <com.coffdope.jeon.cal_ocr.OCR_Preview
+            android:id="@+id/OCR_preview"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:rotation="90"
-            android:visibility="invisible"
+            android:visibility="visible"
             />
 
     </FrameLayout>
