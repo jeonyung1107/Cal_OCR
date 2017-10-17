@@ -44,9 +44,6 @@ public class Detector {
         this.context = context;
         this.size = size;
     }
-    public float getRatio(){
-        return ratio;
-    }
     public Camera.Size getSize(){
         return size;
     }
@@ -55,19 +52,11 @@ public class Detector {
         Bitmap[] result_bitmap = new Bitmap[2];
         ArrayList<MatOfPoint> result_cnt = new ArrayList<MatOfPoint>();
         ratio = (float)size.height/300;
-        input_image = new Mat(size.height,size.width,Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+        input_image = new Mat(size.height,size.width,CvType.CV_8UC4);
         inter_image = new Mat((int)(size.height/ratio),(int)(size.width/ratio),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         output_image = new Mat(inter_image.rows(),inter_image.cols(),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         input_image.put(0,0,bytes);
         Imgproc.resize(input_image,inter_image,new Size(inter_image.width(),inter_image.height()));
-
-//        try{
-//            input_image = Utils.loadResource(context, R.drawable.a, Imgcodecs.CV_LOAD_IMAGE_COLOR);
-//        }catch (IOException e){
-//
-//        }
-//        Imgproc.resize(input_image,inter_image,new Size(inter_image.width(),inter_image.height()));
-//        Imgproc.cvtColor(inter_image, inter_image, Imgproc.COLOR_BGR2GRAY);
 
         /*이미지 전처리*/
         Imgproc.GaussianBlur(inter_image,inter_image,new Size(5,5),8,8);
@@ -115,8 +104,12 @@ public class Detector {
         /*결과물 반환*/
         if(!result_cnt.isEmpty()) {
             Core.multiply(result_cnt.get(0), new Scalar(ratio, ratio), result_cnt.get(0)); //원래 크기로 복구
-            Core.flip(result_cnt.get(0), result_cnt.get(0), 1);
         }
+        Mat tmpM = new Mat(size.height,size.width, CvType.CV_8UC4);
+        Bitmap tmp = Bitmap.createBitmap(input_image.width(), input_image.height(), Bitmap.Config.RGB_565);
+//        Imgproc.drawContours(input_image,result_cnt,-1,new Scalar(255,0,0),5);
+        Utils.matToBitmap(input_image, tmp);
+
         return result_cnt; //contour 반환
     }
 

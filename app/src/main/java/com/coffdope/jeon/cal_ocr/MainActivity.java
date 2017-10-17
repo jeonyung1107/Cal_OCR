@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -143,8 +144,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         mCamera.setDisplayOrientation(90);
         mCamera.setParameters(params);
-        mOCR_height = previewSize.height;
-        mOCR_width = previewSize.width;
 
         try {
             mCamera.setPreviewDisplay(mSurfaceHolder);
@@ -173,8 +172,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
-            mOCR_height = mSurfaceView.getHeight();
-            mOCR_width = mSurfaceView.getWidth();
         }else{
             Log.i(TAG,"no Back");
         }
@@ -196,11 +193,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
 
                 Canvas mCanvas = mOCR_holder.lockCanvas();
-                mCanvas.drawColor(Color.argb(0,255,255,255));
-                Mat mat = new Mat(mOCR_height, mOCR_width,CvType.CV_8UC4);
-                Bitmap cntBitmap = Bitmap.createBitmap(mOCR_width, mOCR_height, Bitmap.Config.ARGB_8888);
+                Mat mat = new Mat(mCanvas.getHeight(), mCanvas.getWidth(),CvType.CV_8UC4);
+                Bitmap cntBitmap = Bitmap.createBitmap(mCanvas.getWidth(), mCanvas.getHeight(), Bitmap.Config.ARGB_8888);
                 try{
                     synchronized (mOCR_holder){
+                        mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                         Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
                         Utils.matToBitmap(mat,cntBitmap);
                         mCanvas.drawBitmap(cntBitmap,0,0,null);
