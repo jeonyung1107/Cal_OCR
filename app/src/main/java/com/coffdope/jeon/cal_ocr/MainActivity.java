@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.os.AsyncTask;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN); //풀스크린
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
         button = (Button)findViewById(R.id.button1);
@@ -140,6 +143,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         mCamera.setDisplayOrientation(90);
         mCamera.setParameters(params);
+        mOCR_height = previewSize.height;
+        mOCR_width = previewSize.width;
 
         try {
             mCamera.setPreviewDisplay(mSurfaceHolder);
@@ -168,8 +173,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
-            mOCR_height = mOCR_preview.getHeight();
-            mOCR_width = mOCR_preview.getWidth();
+            mOCR_height = mSurfaceView.getHeight();
+            mOCR_width = mSurfaceView.getWidth();
         }else{
             Log.i(TAG,"no Back");
         }
@@ -189,22 +194,24 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             if(!tmp.isEmpty()){
                 mContour = tmp;
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
+
+                Canvas mCanvas = mOCR_holder.lockCanvas();
+                mCanvas.drawColor(Color.argb(0,255,255,255));
+                Mat mat = new Mat(mOCR_height, mOCR_width,CvType.CV_8UC4);
+                Bitmap cntBitmap = Bitmap.createBitmap(mOCR_width, mOCR_height, Bitmap.Config.ARGB_8888);
+                try{
+                    synchronized (mOCR_holder){
+                        Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
+                        Utils.matToBitmap(mat,cntBitmap);
+                        mCanvas.drawBitmap(cntBitmap,0,0,null);
+                    }
+                }finally {
+                    mOCR_holder.unlockCanvasAndPost(mCanvas);
+                }
             }else{
                 mContour = (ArrayList<MatOfPoint>) mContour2.clone();
             }
 
-            Canvas mCanvas = mOCR_holder.lockCanvas();
-            Mat mat = new Mat(mOCR_height, mOCR_width, Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
-            Bitmap cntBitmap = Bitmap.createBitmap(mOCR_width, mOCR_height, Bitmap.Config.ARGB_8888);
-            try{
-                synchronized (mOCR_holder){
-                    Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
-                    Utils.matToBitmap(mat,cntBitmap);
-                    mCanvas.drawBitmap(cntBitmap,0,0,null);
-                }
-            }finally {
-                mOCR_holder.unlockCanvasAndPost(mCanvas);
-            }
             return mContour;
         }
 

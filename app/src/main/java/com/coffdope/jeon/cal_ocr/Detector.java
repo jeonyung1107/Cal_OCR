@@ -113,7 +113,10 @@ public class Detector {
         }
 
         /*결과물 반환*/
-        if(!result_cnt.isEmpty())Core.multiply(result_cnt.get(0),new Scalar(ratio,ratio),result_cnt.get(0)); //원래 크기로 복구
+        if(!result_cnt.isEmpty()) {
+            Core.multiply(result_cnt.get(0), new Scalar(ratio, ratio), result_cnt.get(0)); //원래 크기로 복구
+            Core.flip(result_cnt.get(0), result_cnt.get(0), 1);
+        }
         return result_cnt; //contour 반환
     }
 

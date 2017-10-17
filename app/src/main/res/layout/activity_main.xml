@@ -22,8 +22,8 @@
 
         <com.coffdope.jeon.cal_ocr.OCR_Preview
             android:id="@+id/OCR_preview"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:rotation="90"
             android:visibility="visible"
             />

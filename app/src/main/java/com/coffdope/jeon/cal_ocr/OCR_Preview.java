@@ -32,8 +32,6 @@ public class OCR_Preview extends SurfaceView implements SurfaceHolder.Callback{
     public OCR_Preview(Context c,AttributeSet attrs){
         super(c,attrs);
         this.c = c;
-        mHolder = getHolder();
-        mHolder.addCallback(this);
 
     }
     @Override
@@ -43,8 +41,6 @@ public class OCR_Preview extends SurfaceView implements SurfaceHolder.Callback{
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        cntBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-        mat = new Mat(getHeight(), getWidth(), Imgcodecs.CV_LOAD_IMAGE_COLOR);
     }
 
     @Override
@@ -52,16 +48,4 @@ public class OCR_Preview extends SurfaceView implements SurfaceHolder.Callback{
 
     }
 
-    public void drawCnt(ArrayList<MatOfPoint> cnt){
-        mCanvas = mHolder.lockCanvas();
-        try{
-            synchronized (mHolder) {
-                Imgproc.drawContours(mat, cnt, -1, new Scalar(255, 0, 0), 5);
-                Utils.matToBitmap(mat,cntBitmap);
-                mCanvas.drawBitmap(cntBitmap, 0, 0, null);
-            }
-        }finally {
-            mHolder.unlockCanvasAndPost(mCanvas);
-        }
-    }
 }
