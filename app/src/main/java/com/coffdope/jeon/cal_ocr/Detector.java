@@ -52,9 +52,9 @@ public class Detector {
         Bitmap[] result_bitmap = new Bitmap[2];
         ArrayList<MatOfPoint> result_cnt = new ArrayList<MatOfPoint>();
         ratio = (float)size.height/300;
-        input_image = new Mat(size.height,size.width,CvType.CV_8UC4);
-        inter_image = new Mat((int)(size.height/ratio),(int)(size.width/ratio),CvType.CV_8UC4);
-        output_image = new Mat(inter_image.rows(),inter_image.cols(),CvType.CV_8UC4);
+        input_image = new Mat(size.height,size.width,Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+        inter_image = new Mat((int)(size.height/ratio),(int)(size.width/ratio),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+        output_image = new Mat(inter_image.rows(),inter_image.cols(),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         input_image.put(0,0,bytes);
         Imgproc.resize(input_image,inter_image,new Size(inter_image.width(),inter_image.height()));
 
