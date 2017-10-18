@@ -52,7 +52,7 @@ public class Detector {
         Bitmap[] result_bitmap = new Bitmap[2];
         ArrayList<MatOfPoint> result_cnt = new ArrayList<MatOfPoint>();
         ratio = (float)size.height/300;
-        input_image = new Mat(size.height,size.width,CvType.CV_8UC4);
+        input_image = new Mat(size.height,size.width,Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         inter_image = new Mat((int)(size.height/ratio),(int)(size.width/ratio),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         output_image = new Mat(inter_image.rows(),inter_image.cols(),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         input_image.put(0,0,bytes);
@@ -105,10 +105,6 @@ public class Detector {
         if(!result_cnt.isEmpty()) {
             Core.multiply(result_cnt.get(0), new Scalar(ratio, ratio), result_cnt.get(0)); //원래 크기로 복구
         }
-        Mat tmpM = new Mat(size.height,size.width, CvType.CV_8UC4);
-        Bitmap tmp = Bitmap.createBitmap(input_image.width(), input_image.height(), Bitmap.Config.RGB_565);
-//        Imgproc.drawContours(input_image,result_cnt,-1,new Scalar(255,0,0),5);
-        Utils.matToBitmap(input_image, tmp);
 
         return result_cnt; //contour 반환
     }
