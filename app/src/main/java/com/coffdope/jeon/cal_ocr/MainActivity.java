@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
 
                 Canvas mCanvas = mOCR_holder.lockCanvas();
-                Mat mat = new Mat(mCanvas.getHeight(), mCanvas.getWidth(),CvType.CV_8UC4);
+                Mat mat = new Mat(mCanvas.getHeight(), mCanvas.getWidth(),Imgcodecs.);// FIXME: 17. 10. 18 argb 타입 설정
                 Bitmap cntBitmap = Bitmap.createBitmap(mCanvas.getWidth(), mCanvas.getHeight(), Bitmap.Config.ARGB_8888);
                 try{
                     synchronized (mOCR_holder){
