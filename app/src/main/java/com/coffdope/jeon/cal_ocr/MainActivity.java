@@ -194,11 +194,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
 
                 Canvas mCanvas = mOCR_holder.lockCanvas();
-                Mat mat = new Mat(mCanvas.getHeight(), mCanvas.getWidth(),Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);// FIXME: 17. 10. 18 argb 타입 설정
+                Mat mat = new Mat(mCanvas.getHeight(), mCanvas.getWidth(),CvType.CV_8UC4);// FIXME: 17. 10. 18 argb 타입 설정
                 Bitmap cntBitmap = Bitmap.createBitmap(mCanvas.getWidth(), mCanvas.getHeight(), Bitmap.Config.ARGB_8888);
                 try{
                     synchronized (mOCR_holder){
                         mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                        // TODO: 17. 10. 18 contour rotate 시킬것, 높이 -> 너비 , 너비 -> 높이로 새로운 mat 만들어서
                         Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
                         Utils.matToBitmap(mat,cntBitmap);
                         mCanvas.drawBitmap(cntBitmap,0,0,null);
