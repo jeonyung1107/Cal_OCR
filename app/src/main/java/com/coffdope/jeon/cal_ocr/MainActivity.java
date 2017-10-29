@@ -200,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     synchronized (mOCR_holder){
                         mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                         // TODO: 17. 10. 18 contour rotate 시킬것, 높이 -> 너비 , 너비 -> 높이로 새로운 mat 만들어서
+                        Mat tmpMat = Mat.zeros(mContour.get(0).cols(), mContour.get(0).rows(), CvType.CV_8UC4);
                         Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
                         Utils.matToBitmap(mat,cntBitmap);
                         mCanvas.drawBitmap(cntBitmap,0,0,null);
