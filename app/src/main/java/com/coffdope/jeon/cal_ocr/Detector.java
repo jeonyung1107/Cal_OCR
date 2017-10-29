@@ -52,12 +52,11 @@ public class Detector {
         Bitmap[] result_bitmap = new Bitmap[2];
         ArrayList<MatOfPoint> result_cnt = new ArrayList<MatOfPoint>();
         ratio = (float)size.height/300;
-        input_image = new Mat(size.height,size.width,CvType.CV_8UC4);
+        input_image = new Mat(size.height,size.width,CvType.CV_8UC1);
         inter_image = new Mat((int)(size.height/ratio),(int)(size.width/ratio),CvType.CV_8UC1);
         output_image = new Mat(inter_image.rows(),inter_image.cols(),CvType.CV_8UC1);
         input_image.put(0,0,bytes);
-        Imgproc.cvtColor(input_image,inter_image,Imgproc.COLOR_RGBA2GRAY);
-        Imgproc.resize(inter_image,inter_image,new Size(inter_image.width(),inter_image.height()));
+        Imgproc.resize(input_image,inter_image,new Size(inter_image.width(),inter_image.height()));
 
         /*이미지 전처리*/
         Imgproc.GaussianBlur(inter_image,inter_image,new Size(5,5),8,8);
@@ -186,7 +185,7 @@ public class Detector {
     }
     public Bitmap cnt_image(byte[] bytes,ArrayList<MatOfPoint> contour){
         Imgproc.drawContours(input_image,contour,-1,new Scalar(255,0,0),2); //조건 만족하는 contour이는 경우 그린다.
-        Bitmap b = Bitmap.createBitmap(input_image.width(),input_image.height(), Bitmap.Config.RGB_565);
+        Bitmap b = Bitmap.createBitmap(input_image.width(),input_image.height(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(input_image,b);
 
         return b;
