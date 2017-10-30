@@ -199,11 +199,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 ArrayList<MatOfPoint> tmp_cnt = new ArrayList<MatOfPoint>();
                 tmp_cnt.add(new MatOfPoint(new Mat(mCameraSize.width, mCameraSize.height, CvType.CV_8UC4)));
                 Core.rotate(mContour.get(0),tmp_cnt.get(0),Core.ROTATE_90_CLOCKWISE);
-                Bitmap cntBitmap = Bitmap.createBitmap(mCameraSize.width, mCameraSize.height, Bitmap.Config.ARGB_8888);
+                Bitmap cntBitmap = Bitmap.createBitmap(mCameraSize.height, mCameraSize.width, Bitmap.Config.ARGB_8888);
                 try{
                     synchronized (mOCR_holder){
                         mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                        Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
+                        Imgproc.drawContours(mat, tmp_cnt, -1, new Scalar(255, 0, 0), 5);
                         Utils.matToBitmap(mat,cntBitmap);// TODO: 17. 10. 29 need bitmap rotate
                         mCanvas.drawBitmap(cntBitmap,0,0,null);
                     }
