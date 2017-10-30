@@ -195,16 +195,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
 
                 Canvas mCanvas = mOCR_holder.lockCanvas();
-                Mat mat = new Mat(mCameraSize.width, mCameraSize.height,CvType.CV_8UC4);// TODO: 17. 10. 29 채널 믹스 필요함
-                ArrayList<MatOfPoint> tmp_cnt = new ArrayList<MatOfPoint>();
-                tmp_cnt.add(new MatOfPoint());
-                Core.rotate(mContour.get(0),tmp_cnt.get(0),Core.ROTATE_90_CLOCKWISE);
+                Mat mat = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC4);// TODO: 17. 10. 29 채널 믹스 필요함
+                Mat mat_rot = new Mat(mCameraSize.width,mCameraSize.height, CvType.CV_8UC4);
                 Bitmap cntBitmap = Bitmap.createBitmap(mCameraSize.height, mCameraSize.width, Bitmap.Config.ARGB_8888);
                 try{
                     synchronized (mOCR_holder){
                         mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                        Imgproc.drawContours(mat, tmp_cnt, -1, new Scalar(255, 0, 0), 5);
-                        Utils.matToBitmap(mat,cntBitmap);// TODO: 17. 10. 29 need bitmap rotate
+                        Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
+                        Core.rotate(mat,mat_rot,Core.ROTATE_90_CLOCKWISE);
+                        Utils.matToBitmap(mat_rot,cntBitmap);// TODO: 17. 10. 29 need bitmap rotate
                         mCanvas.drawBitmap(cntBitmap,0,0,null);
                     }
                 }finally {
