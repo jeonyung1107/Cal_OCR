@@ -37,6 +37,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -197,13 +198,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 Canvas mCanvas = mOCR_holder.lockCanvas();
                 Mat mat = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC4);// TODO: 17. 10. 29 채널 믹스 필요함
                 Mat mat_rot = new Mat(mCameraSize.width,mCameraSize.height, CvType.CV_8UC4);
-                Bitmap cntBitmap = Bitmap.createBitmap(mCameraSize.height, mCameraSize.width, Bitmap.Config.ARGB_8888);
+                Mat mat_resize = new Mat(mCanvas.getHeight(), mCanvas.getWidth(), CvType.CV_8UC4);
+                Bitmap cntBitmap = Bitmap.createBitmap(mCanvas.getWidth(), mCanvas.getHeight(), Bitmap.Config.ARGB_8888);
                 try{
                     synchronized (mOCR_holder){
                         mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                         Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
                         Core.rotate(mat,mat_rot,Core.ROTATE_90_CLOCKWISE);
-                        Utils.matToBitmap(mat_rot,cntBitmap);// TODO: 17. 10. 29 need bitmap rotate
+                        Imgproc.resize(mat_rot, mat_resize, new Size(mat_resize.width(), mat_resize.height()));
+                        Utils.matToBitmap(mat_resize,cntBitmap);// TODO: 17. 10. 29 need bitmap rotate
                         mCanvas.drawBitmap(cntBitmap,0,0,null);
                     }
                 }finally {
