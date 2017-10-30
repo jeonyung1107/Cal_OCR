@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -194,7 +195,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
 
                 Canvas mCanvas = mOCR_holder.lockCanvas();
-                Mat mat = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC4);// TODO: 17. 10. 29 채널 믹스 필요함 
+                Mat mat = new Mat(mCameraSize.width, mCameraSize.height,CvType.CV_8UC4);// TODO: 17. 10. 29 채널 믹스 필요함
+                ArrayList<MatOfPoint> tmp_cnt = new ArrayList<MatOfPoint>();
+                tmp_cnt.add(new MatOfPoint(new Mat(mCameraSize.width, mCameraSize.height, CvType.CV_8UC4)));
+                Core.rotate(mContour.get(0),tmp_cnt.get(0),Core.ROTATE_90_CLOCKWISE);
                 Bitmap cntBitmap = Bitmap.createBitmap(mCameraSize.width, mCameraSize.height, Bitmap.Config.ARGB_8888);
                 try{
                     synchronized (mOCR_holder){
