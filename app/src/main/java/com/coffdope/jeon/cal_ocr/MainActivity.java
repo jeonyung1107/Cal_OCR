@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 Canvas mCanvas = mOCR_holder.lockCanvas();
                 Mat mat = new Mat(mCameraSize.width, mCameraSize.height,CvType.CV_8UC4);// TODO: 17. 10. 29 채널 믹스 필요함
                 ArrayList<MatOfPoint> tmp_cnt = new ArrayList<MatOfPoint>();
-                tmp_cnt.add(new MatOfPoint(new Mat(mCameraSize.width, mCameraSize.height, CvType.CV_8UC4)));
+                tmp_cnt.add(new MatOfPoint());
                 Core.rotate(mContour.get(0),tmp_cnt.get(0),Core.ROTATE_90_CLOCKWISE);
                 Bitmap cntBitmap = Bitmap.createBitmap(mCameraSize.height, mCameraSize.width, Bitmap.Config.ARGB_8888);
                 try{
