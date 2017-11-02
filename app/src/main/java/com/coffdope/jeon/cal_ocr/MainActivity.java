@@ -183,9 +183,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
             Mat mat_tmp = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC1 );
             mat_tmp.put(0, 0, bytes);
-
-            bmp = Bitmap.createBitmap(mCameraSize.width, mCameraSize.height, Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(mat_tmp,bmp);
         }else{
             Log.i(TAG,"no Back");
         }
