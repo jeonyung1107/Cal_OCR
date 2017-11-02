@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private OCR mOCR;
     private int mOCR_height;
     private int mOCR_width;
-    private Bitmap bmp;
+    private Mat matForTranmsform;
 
     private ArrayList<MatOfPoint> mContour = new ArrayList<MatOfPoint>();
     private ArrayList<MatOfPoint> mContour2 = new ArrayList<MatOfPoint>();
@@ -106,6 +106,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Detector mDetector = new Detector();
+                matForTranmsform=mDetector.four_point_transform(mContour.get(0), matForTranmsform);
+
+                Bitmap bb = Bitmap.createBitmap(matForTranmsform.width(),matForTranmsform.height(), Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(matForTranmsform,bb);
+                bb.getWidth();
             }
         });
         button2.setOnClickListener(new View.OnClickListener(){
@@ -181,8 +187,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
 
-            Mat mat_tmp = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC1 );
-            mat_tmp.put(0, 0, bytes);
+            matForTranmsform = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC1 );
+            matForTranmsform.put(0, 0, bytes);
         }else{
             Log.i(TAG,"no Back");
         }
