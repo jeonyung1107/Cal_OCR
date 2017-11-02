@@ -180,18 +180,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
 
-            Camera.Parameters para = camera.getParameters();
-            int width = para.getPreviewSize().width;
-            int height = para.getPreviewSize().height;
-
-            YuvImage yuv = new YuvImage(bytes, para.getPreviewFormat(), width, height, null);
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            yuv.compressToJpeg(new Rect(0, 0, width, height), 50, out);
-
-            byte[] bytee = out.toByteArray();
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytee, 0, bytee.length);
-            bitmap.getWidth();
+            Mat mat_tmp = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC4 );
+            mat_tmp.put(0, 0, bytes);
+            bmp = Bitmap.createBitmap(mCameraSize.width, mCameraSize.height, Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(mat_tmp,bmp);
+            bmp.getWidth();
         }else{
             Log.i(TAG,"no Back");
         }
