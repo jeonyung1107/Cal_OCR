@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private OCR mOCR;
     private int mOCR_height;
     private int mOCR_width;
+    private Bitmap bmp;
 
     private ArrayList<MatOfPoint> mContour = new ArrayList<MatOfPoint>();
     private ArrayList<MatOfPoint> mContour2 = new ArrayList<MatOfPoint>();
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
+            bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         }else{
             Log.i(TAG,"no Back");
         }
