@@ -38,6 +38,7 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -180,11 +181,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
 
-            Mat mat_tmp = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC4 );
+            Mat mat_tmp = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC1 );
             mat_tmp.put(0, 0, bytes);
+
             bmp = Bitmap.createBitmap(mCameraSize.width, mCameraSize.height, Bitmap.Config.ARGB_8888);
             Utils.matToBitmap(mat_tmp,bmp);
-            bmp.getWidth();
         }else{
             Log.i(TAG,"no Back");
         }
