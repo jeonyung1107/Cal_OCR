@@ -9,6 +9,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -25,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Button;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -176,7 +179,19 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
             mDetectorTask = new DetectorTask(this);
             mDetectorTask.execute(bytes);
-            bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+            Camera.Parameters para = camera.getParameters();
+            int width = para.getPreviewSize().width;
+            int height = para.getPreviewSize().height;
+
+            YuvImage yuv = new YuvImage(bytes, para.getPreviewFormat(), width, height, null);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            yuv.compressToJpeg(new Rect(0, 0, width, height), 50, out);
+
+            byte[] bytee = out.toByteArray();
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytee, 0, bytee.length);
+            bitmap.getWidth();
         }else{
             Log.i(TAG,"no Back");
         }
