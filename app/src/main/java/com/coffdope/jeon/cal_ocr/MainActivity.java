@@ -94,12 +94,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder.addCallback(this);
 
         mOCR_preview = (OCR_Preview) findViewById(R.id.OCR_preview);
-//        mOCR_preview.setRotation(90f);
         mOCR_preview.setZOrderOnTop(true);
         mOCR_holder = mOCR_preview.getHolder();
         mOCR_holder.setFormat(PixelFormat.TRANSPARENT);
 
-//        mOCR = new OCR(this);
+        mOCR = new OCR(this);
 
         //todo 촬영 기능 만들 것 촬영 시 시점 전환도 같이 하도록 하고 프리뷰 호출
         /*버튼 클릭 시 촬영 -> 편집 화면 Intent 콜*/
@@ -176,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         Log.i(TAG,"카메라 해제");
         Toast.makeText(this, "카메라 해제", Toast.LENGTH_SHORT).show();
     }
-    //todo 프리뷰에서 영역 인식 구현, surfaceview 두개 이용해서 만들 것
+
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         if(mDetectorTask == null|| mDetectorTask.getStatus() == AsyncTask.Status.FINISHED){
@@ -206,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
 
                 Canvas mCanvas = mOCR_holder.lockCanvas();
-                Mat mat = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC4);// TODO: 17. 10. 29 채널 믹스 필요함
+                Mat mat = new Mat(mCameraSize.height, mCameraSize.width,CvType.CV_8UC4);
                 Mat mat_rot = new Mat(mCameraSize.width,mCameraSize.height, CvType.CV_8UC4);
                 Mat mat_resize = new Mat(mCanvas.getHeight(), mCanvas.getWidth(), CvType.CV_8UC4);
                 Bitmap cntBitmap = Bitmap.createBitmap(mCanvas.getWidth(), mCanvas.getHeight(), Bitmap.Config.ARGB_8888);
@@ -216,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                         Imgproc.drawContours(mat, mContour, -1, new Scalar(255, 0, 0), 5);
                         Core.rotate(mat,mat_rot,Core.ROTATE_90_CLOCKWISE);
                         Imgproc.resize(mat_rot, mat_resize, new Size(mat_resize.width(), mat_resize.height()));
-                        Utils.matToBitmap(mat_resize,cntBitmap);// TODO: 17. 10. 29 need bitmap rotate
+                        Utils.matToBitmap(mat_resize,cntBitmap);
                         mCanvas.drawBitmap(cntBitmap,0,0,null);
                     }
                 }finally {

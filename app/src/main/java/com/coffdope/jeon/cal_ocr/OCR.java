@@ -28,7 +28,8 @@ public class OCR  {
         mContext = context;
 
         //이미지 디코딩을 위한 초기화
-        image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.b); //샘플이미지파일
+        // TODO: 17. 11. 3 need to load image 
+//        image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.b); //샘플이미지파일
         //언어파일 경로
         datapath = mContext.getFilesDir()+ "/tesseract/";
 

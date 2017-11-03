@@ -4,9 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Cal_OCR.iml" filepath="$PROJECT_DIR$/Cal_OCR.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tess-two-master/eyes-two/eyes-two.iml" filepath="$PROJECT_DIR$/tess-two-master/eyes-two/eyes-two.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" filepath="$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tess-two-master/tess-two-test/tess-two-test.iml" filepath="$PROJECT_DIR$/tess-two-master/tess-two-test/tess-two-test.iml" />
     </modules>
   </component>
 </project>
