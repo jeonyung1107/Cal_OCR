@@ -197,12 +197,29 @@ public class Detector {
     * houghtransform을 이용한다.
     * */
     public Mat findRects(Mat src){
-        Mat input,inter,color_ch, dst;
+        Mat input,inter,hough, result;
         input = src.clone();
+        result = src.clone();
         inter = new Mat(input.size(), CvType.CV_8UC1);
+        hough = new Mat();result = new Mat();
 
         Imgproc.cvtColor(input,inter,Imgproc.COLOR_BGRA2GRAY);
+        Imgproc.blur(inter, inter, new Size(3, 3));
+        Imgproc.Canny(inter,inter,75,200,3,false);
+        Imgproc.HoughLines(inter,hough,2,Math.PI/180,150);
 
-        return new Mat();
+        for(int i=0; i<hough.rows(); ++i){
+            double vec[] = hough.get(i, 0);
+            double x1 = vec[0],
+                    y1 = vec[1],
+                    x2 = vec[2],
+                    y2 = vec[3];
+            Point start = new Point(x1, y1);
+            Point end = new Point(x2, y2);
+
+            Imgproc.line(result,start,end,new Scalar(255,0,0));
+        }
+
+        return result;
     }
 }
