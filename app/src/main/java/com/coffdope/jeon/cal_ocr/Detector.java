@@ -47,7 +47,11 @@ public class Detector {
     public Camera.Size getSize(){
         return size;
     }
-    /*영역 인식 메서드, */
+
+    /*영역 인식 메서드,
+    * byte배열로 주어진 이미지에서 윤곽선을 찾아 반환한다.
+    * 이미지는 연산 속도를 위해 축소되어 처리된다.
+    * */
     public ArrayList<MatOfPoint> detectPage(byte[] bytes){
         Bitmap[] result_bitmap = new Bitmap[2];
         ArrayList<MatOfPoint> result_cnt = new ArrayList<MatOfPoint>();
@@ -61,6 +65,7 @@ public class Detector {
         /*이미지 전처리*/
         Imgproc.GaussianBlur(inter_image,inter_image,new Size(5,5),8,8);
         Imgproc.Canny(inter_image,output_image,75,200,3,false);
+
         /*contour*/
         Imgproc.findContours(output_image,cnt,new Mat(),0,2,new Point(0,0));
 
@@ -75,6 +80,7 @@ public class Detector {
                 else return 0;
             }
         });
+
         /*top 5 저장*/
         if(cnt.size()>5){
             int cnt_size = cnt.size();
@@ -109,6 +115,9 @@ public class Detector {
         return result_cnt; //contour 반환
     }
 
+    /*
+    * 윤곽선과 이미지를 받아 perspective transform을 수행하는 함수
+    * */
     public Mat four_point_transform(MatOfPoint contour, Mat src){
         Point[] ordered = sortPoints(contour.toArray());
 
@@ -179,16 +188,12 @@ public class Detector {
     }
 
     // TODO: 17. 9. 26 findRect needs to be implemented
+    /*
+    * 주어진 이미지에서 격자로 이루어진 사각형을 찾는다.
+    * houghtransform을 이용한다.
+    * */
     public Mat findRects(Mat src){
 
         return new Mat();
     }
-    public Bitmap cnt_image(byte[] bytes,ArrayList<MatOfPoint> contour){
-        Imgproc.drawContours(input_image,contour,-1,new Scalar(255,0,0),2); //조건 만족하는 contour이는 경우 그린다.
-        Bitmap b = Bitmap.createBitmap(input_image.width(),input_image.height(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(input_image,b);
-
-        return b;
-    }
-
 }
