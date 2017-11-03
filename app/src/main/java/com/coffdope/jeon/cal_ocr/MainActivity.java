@@ -108,10 +108,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             public void onClick(View view) {
                 Detector mDetector = new Detector();
                 matForTranmsform=mDetector.four_point_transform(mContour.get(0), matForTranmsform);
-
-                Bitmap bb = Bitmap.createBitmap(matForTranmsform.width(),matForTranmsform.height(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(matForTranmsform,bb);
-                bb.getWidth();
             }
         });
         button2.setOnClickListener(new View.OnClickListener(){

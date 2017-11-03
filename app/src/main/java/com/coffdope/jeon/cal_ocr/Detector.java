@@ -33,13 +33,11 @@ public class Detector {
     private static int idx =0;
     private Context context;
     private Camera.Size size;
-    private Mat input_image,output_image,inter_image;
-    private float ratio;
-    private ArrayList<MatOfPoint> cnt = new ArrayList<MatOfPoint>();
+
+    /*constructors*/
     public Detector() {
         super();
     }
-
     public Detector(Context context, Camera.Size size){
         this.context = context;
         this.size = size;
@@ -53,13 +51,19 @@ public class Detector {
     * 이미지는 연산 속도를 위해 축소되어 처리된다.
     * */
     public ArrayList<MatOfPoint> detectPage(byte[] bytes){
-        Bitmap[] result_bitmap = new Bitmap[2];
+
+        Mat input_image,output_image,inter_image;
         ArrayList<MatOfPoint> result_cnt = new ArrayList<MatOfPoint>();
+        ArrayList<MatOfPoint> cnt = new ArrayList<MatOfPoint>();
+        float ratio;
+
         ratio = (float)size.height/300;
+
         input_image = new Mat(size.height,size.width,CvType.CV_8UC1);
         inter_image = new Mat((int)(size.height/ratio),(int)(size.width/ratio),CvType.CV_8UC1);
         output_image = new Mat(inter_image.rows(),inter_image.cols(),CvType.CV_8UC1);
         input_image.put(0,0,bytes);
+
         Imgproc.resize(input_image,inter_image,new Size(inter_image.width(),inter_image.height()));
 
         /*이미지 전처리*/
@@ -193,6 +197,11 @@ public class Detector {
     * houghtransform을 이용한다.
     * */
     public Mat findRects(Mat src){
+        Mat input,inter,color_ch, dst;
+        input = src.clone();
+        inter = new Mat(input.size(), CvType.CV_8UC1);
+
+        Imgproc.cvtColor(input,inter,Imgproc.COLOR_BGRA2GRAY);
 
         return new Mat();
     }
