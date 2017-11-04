@@ -275,6 +275,7 @@ public class Detector {
                }
            }
         }
+        // TODO: 17. 11. 4  점들 x,y 기준으로 정렬 필요
         return result;
     }
 
