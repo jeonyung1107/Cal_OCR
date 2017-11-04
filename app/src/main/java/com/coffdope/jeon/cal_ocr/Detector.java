@@ -205,29 +205,35 @@ public class Detector {
         hough = new Mat();
 
         Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
-        Imgproc.Canny(inter,thres,80,200,3,false);
-        Imgproc.HoughLines(thres,hough,2,Math.PI/180.0,350);
+//        Imgproc.Canny(inter,thres,80,200,3,false);
+        Imgproc.adaptiveThreshold(inter,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,21,10);
+        MTB(thres);
+        Imgproc.HoughLines(thres,hough,2,Math.PI/180.0,550);
 
         /*ArrayList for intersect parameters*/
         ArrayList<ArrayList<Double>> intersect = new ArrayList<ArrayList<Double>>();
         ArrayList<Point> intersetionPoints = new ArrayList<Point>();
+        double data[][] = new double[hough.rows()][2];
+
+        for(int i=0; i<hough.rows();++i){
+            data[i] = hough.get(i, 0);
+        }
 
         double pos_hori=0;
         double pos_vert=0;
 
         for(int i=0; i<hough.rows(); ++i){
-            double data[] = hough.get(i, 0);
-            double rho = data[0];
-            double theta = data[1];
+            double rho = data[i][0];
+            double theta = data[i][1];
 
             double cos = Math.cos(theta);
             double sin = Math.sin(theta);
             double x0 = cos * rho;
             double y0 = sin * rho;
 
-            Point pt1 = new Point(x0 + 1000 * (-sin), y0 + 1000 * (cos));
-            Point pt2 = new Point(x0 - 1000 * (-sin), y0 - 1000 * (cos));
-            Imgproc.line(input, pt1, pt2, new Scalar(0, 0, 255), 1);
+            Point pt1 = new Point(x0 + 10000 * (-sin), y0 + 10000 * (cos));
+            Point pt2 = new Point(x0 - 10000 * (-sin), y0 - 10000 * (cos));
+            Imgproc.line(input, pt1, pt2, new Scalar(0, 0, 255), 4);
 
             if(sin >0.5){
                if(rho-pos_hori>10){
