@@ -245,7 +245,7 @@ public class Detector {
             Point pt2 = new Point(x0 - 10000 * (-sin), y0 - 10000 * (cos));
 
             if(sin >0.5){
-               if(rho-pos_hori>20){
+               if(rho-pos_hori>50){
                    pos_hori=rho;
                    ArrayList<Double> tmp = new ArrayList<Double>();
                    tmp.add(rho);
@@ -254,7 +254,7 @@ public class Detector {
                    intersect.add(tmp);
                }
             }else {
-                if(rho-pos_vert>20){
+                if(rho-pos_vert>50){
                     pos_vert=rho;
                     ArrayList<Double> tmp = new ArrayList<Double>();
                     tmp.add(rho);
