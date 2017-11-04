@@ -207,7 +207,6 @@ public class Detector {
         Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
 //        Imgproc.Canny(inter,thres,80,200,3,false);
         Imgproc.adaptiveThreshold(inter,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,21,10);
-        MTB(thres);
         Imgproc.HoughLines(thres,hough,2,Math.PI/180.0,550);
 
         /*ArrayList for intersect parameters*/
@@ -244,10 +243,9 @@ public class Detector {
 
             Point pt1 = new Point(x0 + 10000 * (-sin), y0 + 10000 * (cos));
             Point pt2 = new Point(x0 - 10000 * (-sin), y0 - 10000 * (cos));
-            Imgproc.line(input, pt1, pt2, new Scalar(0, 0, 255), 4);
 
             if(sin >0.5){
-               if(rho-pos_hori>10){
+               if(rho-pos_hori>20){
                    pos_hori=rho;
                    ArrayList<Double> tmp = new ArrayList<Double>();
                    tmp.add(rho);
@@ -256,7 +254,7 @@ public class Detector {
                    intersect.add(tmp);
                }
             }else {
-                if(rho-pos_vert>10){
+                if(rho-pos_vert>20){
                     pos_vert=rho;
                     ArrayList<Double> tmp = new ArrayList<Double>();
                     tmp.add(rho);
@@ -266,7 +264,6 @@ public class Detector {
                 }
             }
         }
-        MTB(input);
 
         /*get intersection points*/
         for(int i=0; i<intersect.size();++i){
