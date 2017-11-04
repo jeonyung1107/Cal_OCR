@@ -205,8 +205,10 @@ public class Detector {
         hough = new Mat();
 
         Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
-        Imgproc.adaptiveThreshold(inter, thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY,21,10);
-        Imgproc.HoughLines(thres,hough,2,Math.PI/180,2500);
+        Imgproc.adaptiveThreshold(inter,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,21,10);
+        MTB(thres);
+
+        Imgproc.HoughLines(thres,hough,2,Math.PI/180,150);
 
         /*ArrayList for intersect parameters*/
         ArrayList<ArrayList<Double>> intersect = new ArrayList<ArrayList<Double>>();
