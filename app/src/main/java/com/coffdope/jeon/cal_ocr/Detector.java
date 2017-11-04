@@ -204,7 +204,6 @@ public class Detector {
         inter = new Mat(input.size(), CvType.CV_8UC1);
         hough = new Mat();result = new Mat();
 
-        Imgproc.cvtColor(input,inter,Imgproc.COLOR_BGRA2GRAY);
         Imgproc.blur(inter, inter, new Size(3, 3));
         Imgproc.Canny(inter,inter,75,200,3,false);
         Imgproc.HoughLines(inter,hough,2,Math.PI/180,150);
@@ -275,6 +274,10 @@ public class Detector {
                }
            }
         }
+        for(Point i:intersetionPoints){
+            Imgproc.circle(input,i,10,new Scalar(0,0,225));
+        }
+        MTB(input);
         // TODO: 17. 11. 4  점들 x,y 기준으로 정렬 필요
         return result;
     }
