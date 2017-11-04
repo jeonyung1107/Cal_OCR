@@ -97,6 +97,19 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mOCR_preview.setZOrderOnTop(true);
         mOCR_holder = mOCR_preview.getHolder();
         mOCR_holder.setFormat(PixelFormat.TRANSPARENT);
+        mOCR_preview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean b, Camera camera) {
+                       if(b){
+                           Toast.makeText(getApplicationContext(), "autoFocus",Toast.LENGTH_SHORT);
+                       }
+                    }
+                });
+            }
+        });
 
         mOCR = new OCR(this);
 
@@ -108,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 Detector mDetector = new Detector();
                 matForTranmsform=mDetector.four_point_transform(mContour.get(0), matForTranmsform);
                 matForTranmsform = mDetector.findRects(matForTranmsform);
-                mDetector.MTB(matForTranmsform);
             }
         });
         button2.setOnClickListener(new View.OnClickListener(){

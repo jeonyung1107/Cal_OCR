@@ -198,15 +198,15 @@ public class Detector {
     * houghtransform을 이용한다.
     * */
     public Mat findRects(Mat src){
-        Mat input,inter,hough, result;
+        Mat input,inter,hough, thres;
         input = src.clone();
-        result = src.clone();
         inter = new Mat(input.size(), CvType.CV_8UC1);
-        hough = new Mat();result = new Mat();
+        thres = new Mat(input.size(), CvType.CV_8UC1);
+        hough = new Mat();
 
-        Imgproc.blur(inter, inter, new Size(3, 3));
-        Imgproc.Canny(inter,inter,75,200,3,false);
-        Imgproc.HoughLines(inter,hough,2,Math.PI/180,150);
+        Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
+        Imgproc.adaptiveThreshold(inter, thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY,21,10);
+        Imgproc.HoughLines(thres,hough,2,Math.PI/180,2500);
 
         /*ArrayList for intersect parameters*/
         ArrayList<ArrayList<Double>> intersect = new ArrayList<ArrayList<Double>>();
@@ -225,9 +225,9 @@ public class Detector {
             double x0 = cos * rho;
             double y0 = sin * rho;
 
-            Point pt1 = new Point(x0 + 10000 * (-sin), y0 + 10000 * (cos));
-            Point pt2 = new Point(x0 - 10000 * (-sin), y0 - 10000 * (cos));
-            Imgproc.line(result,pt1,pt2,new Scalar(0,0,225),2);
+            Point pt1 = new Point(x0 + 1000 * (-sin), y0 + 1000 * (cos));
+            Point pt2 = new Point(x0 - 1000 * (-sin), y0 - 1000 * (cos));
+            Imgproc.line(input, pt1, pt2, new Scalar(0, 0, 255), 1);
 
             if(sin >0.5){
                if(rho-pos_hori>10){
@@ -249,6 +249,7 @@ public class Detector {
                 }
             }
         }
+        MTB(input);
 
         /*get intersection points*/
         for(int i=0; i<intersect.size();++i){
@@ -279,7 +280,7 @@ public class Detector {
         }
         MTB(input);
         // TODO: 17. 11. 4  점들 x,y 기준으로 정렬 필요
-        return result;
+        return input;
     }
 
     /*
