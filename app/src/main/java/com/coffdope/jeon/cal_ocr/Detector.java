@@ -221,6 +221,17 @@ public class Detector {
 
         double pos_hori=0;
         double pos_vert=0;
+        Arrays.sort(data, new Comparator<double[]>() {
+            @Override
+            public int compare(double[] doubles, double[] t1) {
+                if(doubles[0]>t1[0]){
+                    return 1;
+                }else if(doubles[0]<t1[0]){
+                    return -1;
+                }else
+                return 0;
+            }
+        });
 
         for(int i=0; i<hough.rows(); ++i){
             double rho = data[i][0];
