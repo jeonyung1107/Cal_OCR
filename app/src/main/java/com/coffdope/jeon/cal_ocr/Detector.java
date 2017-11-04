@@ -209,15 +209,18 @@ public class Detector {
         Imgproc.HoughLines(inter,hough,2,Math.PI/180,150);
 
         for(int i=0; i<hough.rows(); ++i){
-            double vec[] = hough.get(i, 0);
-            double x1 = vec[0],
-                    y1 = vec[1],
-                    x2 = vec[2],
-                    y2 = vec[3];
-            Point start = new Point(x1, y1);
-            Point end = new Point(x2, y2);
+            double data[] = hough.get(i, 0);
+            double rho1 = data[0];
+            double theta1 = data[1];
 
-            Imgproc.line(result,start,end,new Scalar(255,0,0));
+            double cos = Math.cos(theta1);
+            double sin = Math.sin(theta1);
+            double x0 = cos * rho1;
+            double y0 = sin * rho1;
+
+            Point pt1 = new Point(x0 + 10000 * (-sin), y0 + 10000 * (cos));
+            Point pt2 = new Point(x0 - 10000 * (-sin), y0 - 10000 * (cos));
+            Imgproc.line(result,pt1,pt2,new Scalar(0,0,225),2);
         }
 
         return result;
