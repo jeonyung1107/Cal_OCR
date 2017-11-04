@@ -205,10 +205,8 @@ public class Detector {
         hough = new Mat();
 
         Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
-        Imgproc.adaptiveThreshold(inter,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,21,10);
-        MTB(thres);
-
-        Imgproc.HoughLines(thres,hough,2,Math.PI/180,150);
+        Imgproc.Canny(inter,thres,80,200,3,false);
+        Imgproc.HoughLines(thres,hough,2,Math.PI/180.0,350);
 
         /*ArrayList for intersect parameters*/
         ArrayList<ArrayList<Double>> intersect = new ArrayList<ArrayList<Double>>();
@@ -278,7 +276,7 @@ public class Detector {
            }
         }
         for(Point i:intersetionPoints){
-            Imgproc.circle(input,i,10,new Scalar(0,0,225));
+            Imgproc.circle(input,i,10,new Scalar(0,0,225),5);
         }
         MTB(input);
         // TODO: 17. 11. 4  점들 x,y 기준으로 정렬 필요
