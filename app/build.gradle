@@ -29,4 +29,5 @@ dependencies {
     compile 'com.rmtheis:tess-two:7.0.0'
     testCompile 'junit:junit:4.12'
     compile project(':openCVLibrary320')
+    implementation files('libs/Jama-1.0.3.jar')
 }

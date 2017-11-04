@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Arrays;
+import Jama.Matrix;
 
 import java.io.IOException;
 
@@ -210,6 +211,8 @@ public class Detector {
 
         /*ArrayList for intersect parameters*/
         ArrayList<ArrayList<Double>> intersect = new ArrayList<ArrayList<Double>>();
+        ArrayList<Point> intersetionPoints = new ArrayList<Point>();
+
         double pos_hori=0;
         double pos_vert=0;
 
@@ -248,6 +251,7 @@ public class Detector {
             }
         }
 
+        /*get intersection points*/
         for(int i=0; i<intersect.size();++i){
            if(intersect.get(i).get(2)<0){
                for(int j=0; j<intersect.size();++j){
@@ -258,6 +262,15 @@ public class Detector {
                       double rho_point_1 = intersect.get(i).get(0);
                       double rho_point_2 = intersect.get(j).get(0);
 
+                      double[][] cossin = {{Math.cos(theta_point_1), Math.sin(theta_point_1)}, {Math.cos(theta_point_2), Math.sin(theta_point_2)}};
+                      double[][] rhos = {{rho_point_1}, {rho_point_2}};
+
+                      Matrix cosSin = new Matrix(cossin);
+                      Matrix rho_mat = new Matrix(rhos);
+
+                      Matrix x = cosSin.solve(rho_mat);
+
+                      intersetionPoints.add(new Point(x.get(0, 0), x.get(1, 0)));
                   }
                }
            }
