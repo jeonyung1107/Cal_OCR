@@ -222,4 +222,13 @@ public class Detector {
 
         return result;
     }
+
+    /*
+    * mat data to size matcing bitmap
+    * */
+    public Bitmap MTB(Mat src){
+        Bitmap result = Bitmap.createBitmap(src.cols(), src.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(src,result);
+        return result;
+    }
 }

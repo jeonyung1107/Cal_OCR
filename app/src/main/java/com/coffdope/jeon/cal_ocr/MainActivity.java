@@ -107,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             public void onClick(View view) {
                 Detector mDetector = new Detector();
                 matForTranmsform=mDetector.four_point_transform(mContour.get(0), matForTranmsform);
+                matForTranmsform = mDetector.findRects(matForTranmsform);
+                mDetector.MTB(matForTranmsform);
             }
         });
         button2.setOnClickListener(new View.OnClickListener(){
