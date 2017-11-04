@@ -208,21 +208,60 @@ public class Detector {
         Imgproc.Canny(inter,inter,75,200,3,false);
         Imgproc.HoughLines(inter,hough,2,Math.PI/180,150);
 
+        /*ArrayList for intersect parameters*/
+        ArrayList<ArrayList<Double>> intersect = new ArrayList<ArrayList<Double>>();
+        double pos_hori=0;
+        double pos_vert=0;
+
         for(int i=0; i<hough.rows(); ++i){
             double data[] = hough.get(i, 0);
-            double rho1 = data[0];
-            double theta1 = data[1];
+            double rho = data[0];
+            double theta = data[1];
 
-            double cos = Math.cos(theta1);
-            double sin = Math.sin(theta1);
-            double x0 = cos * rho1;
-            double y0 = sin * rho1;
+            double cos = Math.cos(theta);
+            double sin = Math.sin(theta);
+            double x0 = cos * rho;
+            double y0 = sin * rho;
 
             Point pt1 = new Point(x0 + 10000 * (-sin), y0 + 10000 * (cos));
             Point pt2 = new Point(x0 - 10000 * (-sin), y0 - 10000 * (cos));
             Imgproc.line(result,pt1,pt2,new Scalar(0,0,225),2);
+
+            if(sin >0.5){
+               if(rho-pos_hori>10){
+                   pos_hori=rho;
+                   ArrayList<Double> tmp = new ArrayList<Double>();
+                   tmp.add(rho);
+                   tmp.add(theta);
+                   tmp.add(-1d);
+                   intersect.add(tmp);
+               }
+            }else {
+                if(rho-pos_vert>10){
+                    pos_vert=rho;
+                    ArrayList<Double> tmp = new ArrayList<Double>();
+                    tmp.add(rho);
+                    tmp.add(theta);
+                    tmp.add(1d);
+                    intersect.add(tmp);
+                }
+            }
         }
 
+        for(int i=0; i<intersect.size();++i){
+           if(intersect.get(i).get(2)<0){
+               for(int j=0; j<intersect.size();++j){
+                  if(intersect.get(j).get(2)>0){
+                      double theta_point_1 = intersect.get(i).get(1);
+                      double theta_point_2 = intersect.get(j).get(1);
+
+                      double rho_point_1 = intersect.get(i).get(0);
+                      double rho_point_2 = intersect.get(j).get(0);
+
+                  }
+               }
+           }
+        }
         return result;
     }
 
