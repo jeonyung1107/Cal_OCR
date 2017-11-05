@@ -197,7 +197,7 @@ public class Detector {
     * 주어진 이미지에서 격자로 이루어진 사각형을 찾는다.
     * houghtransform을 이용한다.
     * */
-    public Mat findRects(Mat src){
+    public ArrayList<Point> findRects(Mat src){
         Mat input,inter,hough, thres;
         input = new Mat(src.cols(),src.rows(),src.type());
         Core.rotate(src, input, Core.ROTATE_90_CLOCKWISE);
@@ -315,18 +315,32 @@ public class Detector {
             }
         });
 
+        /*remove duplicate points*/
         ArrayList<Point> intPoints = new ArrayList<Point>();
         Point pivotP = intersetionPoints.get(0);
         for(Point i:intersetionPoints){
             if(i==intersetionPoints.get(0)||Math.sqrt(Math.pow(pivotP.x-i.x,2)+Math.pow(pivotP.y-i.y,2))>50) {
                 intPoints.add(i);
                 pivotP = i;
-                Imgproc.circle(input, i, 10, new Scalar(0, 0, 225), 5);
-                MTB(input);
             }
         }
         // TODO: 17. 11. 4  점들 x,y 기준으로 정렬 필요
-        return input;
+        return intPoints;
+    }
+
+    /*
+    * crop image with rect given by pts
+    * */
+    ArrayList<Mat> cropImage(Mat image,ArrayList<Point> pts){
+
+    }
+
+    /*
+    *
+    * */
+    ArrayList<Point> findIntersectionPoints(Mat lines){
+
+        return null;
     }
 
     /*
