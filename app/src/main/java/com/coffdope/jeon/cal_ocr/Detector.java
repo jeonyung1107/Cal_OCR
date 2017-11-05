@@ -297,8 +297,33 @@ public class Detector {
            }
         }
 
+        /*sort intersectionPoints*/
+        Collections.sort(intersetionPoints, new Comparator<Point>() {
+            @Override
+            public int compare(Point point, Point t1) {
+                if(point.y<t1.y-100){
+                    return -1;
+                }else if(point.y-100>t1.y){
+                    return 1;
+                }else if(point.x<t1.x){
+                    return -1;
+                }else if(point.x>t1.x){
+                    return 1;
+                }else {
+                    return 0;
+                }
+            }
+        });
+
+        ArrayList<Point> intPoints = new ArrayList<Point>();
+        Point pivotP = intersetionPoints.get(0);
         for(Point i:intersetionPoints){
-            Imgproc.circle(input,i,10,new Scalar(0,0,225),5);
+            if(i==intersetionPoints.get(0)||Math.sqrt(Math.pow(pivotP.x-i.x,2)+Math.pow(pivotP.y-i.y,2))>50) {
+                intPoints.add(i);
+                pivotP = i;
+                Imgproc.circle(input, i, 10, new Scalar(0, 0, 225), 5);
+                MTB(input);
+            }
         }
         // TODO: 17. 11. 4  점들 x,y 기준으로 정렬 필요
         return input;
