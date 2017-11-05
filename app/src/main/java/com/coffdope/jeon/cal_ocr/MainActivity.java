@@ -4,13 +4,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -22,15 +19,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Button;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.opencv.android.OpenCVLoader;
@@ -38,11 +31,10 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback {
@@ -120,15 +112,24 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             public void onClick(View view) {
                 Detector mDetector = new Detector();
                 matForTranmsform=mDetector.four_point_transform(mContour.get(0), matForTranmsform);
-                matForTranmsform = mDetector.findRects(matForTranmsform);
+                ArrayList<Point> pts = mDetector.findIntersections(matForTranmsform);
+                matForTranmsform = mDetector.rotate(matForTranmsform);
+                ArrayList<Mat> cropped = mDetector.cropImage(matForTranmsform, pts);
+
+                String st = "";
+                for(Mat s: cropped){
+                    Bitmap bm = Bitmap.createBitmap(s.cols(), s.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(s,bm);
+                    st += mOCR.processImage(bm);
+                }
+                cal = new Calendar_activity();
+                // TODO: 17. 9. 10 이번트 등록 완전히 구현
+                startActivity(cal.insert_event(2014,05,05,12,00,st));
             }
         });
         button2.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                cal = new Calendar_activity();
-                // TODO: 17. 9. 10 이번트 등록 완전히 구현
-                startActivity(cal.insert_event(2014,05,05,12,00,"test"));
             }
         });
     }
