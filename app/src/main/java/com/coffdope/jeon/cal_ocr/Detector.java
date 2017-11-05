@@ -204,6 +204,7 @@ public class Detector {
         thres = new Mat(input.size(), CvType.CV_8UC1);
         hough = new Mat();
 
+        Imgproc.rectangle(input,new Point(0,0),new Point(input.width(),input.height()),new Scalar(0,0,0));
         Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
 //        Imgproc.Canny(inter,thres,80,200,3,false);
         Imgproc.adaptiveThreshold(inter,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,21,10);
