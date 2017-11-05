@@ -199,12 +199,13 @@ public class Detector {
     * */
     public Mat findRects(Mat src){
         Mat input,inter,hough, thres;
-        input = src.clone();
+        input = new Mat(src.cols(),src.rows(),src.type());
+        Core.rotate(src, input, Core.ROTATE_90_CLOCKWISE);
         inter = new Mat(input.size(), CvType.CV_8UC1);
         thres = new Mat(input.size(), CvType.CV_8UC1);
         hough = new Mat();
 
-        Imgproc.rectangle(input,new Point(0,0),new Point(input.width(),input.height()),new Scalar(0,0,0));
+        Imgproc.rectangle(input,new Point(0,0),new Point(input.width()-0,input.height()-0),new Scalar(0,0,0),3);
         Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
 //        Imgproc.Canny(inter,thres,80,200,3,false);
         Imgproc.adaptiveThreshold(inter,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,21,10);
@@ -221,6 +222,7 @@ public class Detector {
 
         double pos_hori=0;
         double pos_vert=0;
+
         Arrays.sort(data, new Comparator<double[]>() {
             @Override
             public int compare(double[] doubles, double[] t1) {
@@ -233,6 +235,8 @@ public class Detector {
             }
         });
 
+        int hori_flag=0;
+        int vert_flag=0;
         for(int i=0; i<hough.rows(); ++i){
             double rho = data[i][0];
             double theta = data[i][1];
@@ -242,26 +246,28 @@ public class Detector {
             double x0 = cos * rho;
             double y0 = sin * rho;
 
-            Point pt1 = new Point(x0 + 10000 * (-sin), y0 + 10000 * (cos));
-            Point pt2 = new Point(x0 - 10000 * (-sin), y0 - 10000 * (cos));
+            Point pt1 = new Point(x0 + 20000 * (-sin), y0 + 20000 * (cos));
+            Point pt2 = new Point(x0 - 20000 * (-sin), y0 - 20000 * (cos));
 
             if(sin >0.5){
-               if(rho-pos_hori>50){
+               if(hori_flag==0||rho-pos_hori>100){
                    pos_hori=rho;
                    ArrayList<Double> tmp = new ArrayList<Double>();
                    tmp.add(rho);
                    tmp.add(theta);
                    tmp.add(-1d);
                    intersect.add(tmp);
+                   hori_flag=1;
                }
             }else {
-                if(rho-pos_vert>50){
+                if(vert_flag==0||rho-pos_vert>100){
                     pos_vert=rho;
                     ArrayList<Double> tmp = new ArrayList<Double>();
                     tmp.add(rho);
                     tmp.add(theta);
                     tmp.add(1d);
                     intersect.add(tmp);
+                    vert_flag=1;
                 }
             }
         }
@@ -290,10 +296,10 @@ public class Detector {
                }
            }
         }
+
         for(Point i:intersetionPoints){
             Imgproc.circle(input,i,10,new Scalar(0,0,225),5);
         }
-        MTB(input);
         // TODO: 17. 11. 4  점들 x,y 기준으로 정렬 필요
         return input;
     }
