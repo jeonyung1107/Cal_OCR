@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 matForTranmsform = mDetector.rotate(matForTranmsform);
                 ArrayList<Mat> cropped = mDetector.cropImage(matForTranmsform, pts);
 
+                // TODO: 17. 11. 6 need to make async
                 String st = "";
                 for(Mat s: cropped){
                     Bitmap bm = Bitmap.createBitmap(s.cols(), s.rows(), Bitmap.Config.ARGB_8888);
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 }
                 cal = new Calendar_activity();
                 // TODO: 17. 9. 10 이번트 등록 완전히 구현
-                startActivity(cal.insert_event(2014,05,05,12,00,st));
+                startActivity(cal.insert_event(2017,05,01,12,00,st));
             }
         });
         button2.setOnClickListener(new View.OnClickListener(){
