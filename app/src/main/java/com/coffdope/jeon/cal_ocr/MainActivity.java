@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         setContentView(R.layout.activity_main);
 
         button = (Button)findViewById(R.id.button1);
-        button2 = (Button) findViewById(R.id.button2);
 
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
         mSurfaceHolder = mSurfaceView.getHolder();
@@ -126,11 +125,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 cal = new Calendar_activity();
                 // TODO: 17. 9. 10 이번트 등록 완전히 구현
                 startActivity(cal.insert_event(2017,05,01,12,00,st));
-            }
-        });
-        button2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
             }
         });
     }

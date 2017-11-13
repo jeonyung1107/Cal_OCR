@@ -38,12 +38,6 @@
             android:layout_height="wrap_content"
             android:text="촬영"
             android:layout_weight="1"/>
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="캘린더"
-            android:layout_weight="1"/>
 
     </LinearLayout>
 
