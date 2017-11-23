@@ -57,8 +57,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private OCR_Preview mOCR_preview;
     private Camera.Size mCameraSize;
     private OCR mOCR;
-    private int mOCR_height;
-    private int mOCR_width;
     private Mat matForTranmsform;
 
     private ArrayList<MatOfPoint> mContour = new ArrayList<MatOfPoint>();
