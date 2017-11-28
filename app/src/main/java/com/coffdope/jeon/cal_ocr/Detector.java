@@ -207,7 +207,6 @@ public class Detector {
 
         Imgproc.rectangle(input,new Point(0,0),new Point(input.width()-0,input.height()-0),new Scalar(0,0,0),3);
         Imgproc.GaussianBlur(input, inter, new Size(5, 5),8,8);
-//        Imgproc.Canny(inter,thres,80,200,3,false);
         Imgproc.adaptiveThreshold(inter,thres,255,Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,Imgproc.THRESH_BINARY_INV,21,10);
         Imgproc.HoughLines(thres,hough,2,Math.PI/180.0,550);
 
@@ -375,21 +374,13 @@ public class Detector {
         return result;
     }
 
-    /*
-    *
-    * */
-    ArrayList<Point> findIntersectionPoints(Mat lines){
-
-        return null;
-    }
-
     Mat rotate(Mat src){
         Mat roteted = new Mat(src.cols(), src.rows(), src.type());
         Core.rotate(src, roteted, Core.ROTATE_90_CLOCKWISE);
         return roteted;
     }
     /*
-    * mat data to size matcing bitmap
+    * mat data to size matching bitmap
     * */
     public Bitmap MTB(Mat src){
         Bitmap result = Bitmap.createBitmap(src.cols(), src.rows(), Bitmap.Config.ARGB_8888);
