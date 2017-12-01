@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder, mOCR_holder;
     private Camera mCamera;
-    private Button button,button2;
+    private Button button;
     private DetectorTask mDetectorTask;
     private OCR_Preview mOCR_preview;
     private Camera.Size mCameraSize;
@@ -86,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mOCR_preview.setZOrderOnTop(true);
         mOCR_holder = mOCR_preview.getHolder();
         mOCR_holder.setFormat(PixelFormat.TRANSPARENT);
+
+        mOCR = new OCR(this);
+
+        /*autofocus on touching the screen*/
         mOCR_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,9 +104,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             }
         });
 
-        mOCR = new OCR(this);
-
-        //todo 촬영 기능 만들 것 촬영 시 시점 전환도 같이 하도록 하고 프리뷰 호출
         /*버튼 클릭 시 촬영 -> 편집 화면 Intent 콜*/
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,8 +121,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     Utils.matToBitmap(s,bm);
                     st += mOCR.processImage(bm);
                 }
+
                 cal = new Calendar_activity();
-                // TODO: 17. 9. 10 이번트 등록 완전히 구현
                 startActivity(cal.insert_event(2017,05,01,12,00,st));
             }
         });
@@ -153,9 +154,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         Camera.Parameters params = mCamera.getParameters();
         final List<Camera.Size> listPreviewSize = params.getSupportedPreviewSizes();
-        for (Camera.Size size : listPreviewSize) {
-            Log.i(TAG, String.format("Supported Preview Size (%d, %d)", size.width, size.height));
-        }
         Camera.Size previewSize = listPreviewSize.get(0);
         params.setPreviewSize(previewSize.width, previewSize.height);
 
@@ -180,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         mCamera.release();
         mCamera = null;
-        Log.i(TAG,"카메라 해제");
         Toast.makeText(this, "카메라 해제", Toast.LENGTH_SHORT).show();
     }
 
@@ -204,10 +201,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         public DetectorTask(Context context){
             this.context = context;
         }
+
         @Override
         protected ArrayList<MatOfPoint> doInBackground(byte[]...bytes){
+
             mDetector = new Detector(context, mCameraSize);
             ArrayList<MatOfPoint> tmp = mDetector.detectPage(bytes[0]);
+
             if(!tmp.isEmpty()){
                 mContour = tmp;
                 mContour2 = (ArrayList<MatOfPoint>) mContour.clone();
@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 Mat mat_rot = new Mat(mCameraSize.width,mCameraSize.height, CvType.CV_8UC4);
                 Mat mat_resize = new Mat(mCanvas.getHeight(), mCanvas.getWidth(), CvType.CV_8UC4);
                 Bitmap cntBitmap = Bitmap.createBitmap(mCanvas.getWidth(), mCanvas.getHeight(), Bitmap.Config.ARGB_8888);
+
                 try{
                     synchronized (mOCR_holder){
                         mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);

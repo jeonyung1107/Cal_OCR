@@ -71,11 +71,10 @@ public class Detector {
         /*이미지 전처리*/
         Imgproc.GaussianBlur(inter_image,inter_image,new Size(5,5),8,8);
         Imgproc.Canny(inter_image,output_image,75,200,3,false);
+        MTB(output_image);
 
         /*contour*/
         Imgproc.findContours(output_image,cnt,new Mat(),0,2,new Point(0,0));
-
-        /*cnt contourArea크기로 내림차순 정렬*/
         Collections.sort( cnt, new Comparator<MatOfPoint>() {
             @Override
             public int compare(MatOfPoint matOfPoint, MatOfPoint t1) {
@@ -154,6 +153,8 @@ public class Detector {
 
         Mat m = Imgproc.getPerspectiveTransform(src_mat, dst_mat);
         Imgproc.warpPerspective(src, result, m, result.size());
+
+        MTB(result);
 
         return  result;
     }
